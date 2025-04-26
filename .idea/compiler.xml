@@ -9,7 +9,7 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="bank-common" target="1.8" />
+      <module name="io.github.oguzalpcepni" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>
