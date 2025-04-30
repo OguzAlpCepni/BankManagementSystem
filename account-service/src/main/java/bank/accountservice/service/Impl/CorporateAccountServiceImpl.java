@@ -6,8 +6,10 @@ import bank.accountservice.dto.response.CorporateAccountResponse;
 import bank.accountservice.dto.response.TransactionResponse;
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.entity.CorporateAccount;
+import bank.accountservice.exception.BusinessRuleException;
 import bank.accountservice.repository.CorporateAccountRepository;
 import bank.accountservice.service.CorporateAccountService;
+import bank.accountservice.validation.CorporateAccountBusinessRuleValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
@@ -31,10 +33,14 @@ import java.util.stream.Collectors;
 public class CorporateAccountServiceImpl implements CorporateAccountService {
 
     private final CorporateAccountRepository corporateAccountRepository;
+    private final CorporateAccountBusinessRuleValidator validator;
 
     @Override
     @Transactional
     public CorporateAccountResponse createAccount(CreateCorporateAccountRequest request) {
+        // İş kurallarını doğrula
+        validator.validateCreateAccount(request);
+        
         // Yeni hesap nesnesi oluştur
         CorporateAccount account = new CorporateAccount();
         
@@ -109,6 +115,11 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
         CorporateAccount existingAccount = corporateAccountRepository.findById(id)
             .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
             
+        // Vergi numarası validasyonu
+        if (accountDto.getTaxNumber() != null && !accountDto.getTaxNumber().matches("\\d{10}")) {
+            throw new BusinessRuleException("Tax number must be 10 digits");
+        }
+            
         // Sadece güncellenebilir alanları güncelle (null olmayan alanlar)
         if (accountDto.getTaxNumber() != null) {
             existingAccount.setTaxNumber(accountDto.getTaxNumber());
@@ -120,6 +131,11 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
             existingAccount.setAuthorizedPerson(accountDto.getAuthorizedPerson());
         }
         if (accountDto.getOverdraftLimit() != null) {
+            // Overdraft limiti kontrolü
+            BigDecimal maxOverdraftLimit = new BigDecimal("10000.00");
+            if (accountDto.getOverdraftLimit().compareTo(maxOverdraftLimit) > 0) {
+                throw new BusinessRuleException("Overdraft limit cannot exceed " + maxOverdraftLimit);
+            }
             existingAccount.setOverdraftLimit(accountDto.getOverdraftLimit());
         }
         
@@ -150,6 +166,9 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
         BigDecimal oldBalance = account.getBalance();
         
         try {
+            // İş kurallarını doğrula
+            validator.validateDeposit(account, amount);
+            
             // Para yatırma işlemini gerçekleştir
             account = depositInternal(account, amount);
             
@@ -189,16 +208,6 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
      * @throws IllegalStateException Hesap aktif değilse fırlatılır
      */
     private CorporateAccount depositInternal(CorporateAccount account, BigDecimal amount) {
-        // Miktar kontrolü
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Deposit amount must be positive");
-        }
-        
-        // Hesap durumu kontrolü
-        if (account.getStatus() != AccountStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot deposit to an account with status: " + account.getStatus());
-        }
-                
         // Yeni bakiyeyi hesapla ve güncelle
         BigDecimal newBalance = account.getBalance().add(amount);
         account.setBalance(newBalance);
@@ -227,6 +236,9 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
         BigDecimal oldBalance = account.getBalance();
         
         try {
+            // İş kurallarını doğrula
+            validator.validateWithdrawal(account, amount);
+            
             // Para çekme işlemini gerçekleştir
             account = withdrawInternal(account, amount);
             
@@ -271,20 +283,6 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
             throw new IllegalArgumentException("Withdrawal amount must be positive");
         }
         
-        // Hesap durumu kontrolü
-        if (account.getStatus() != AccountStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot withdraw from an account with status: " + account.getStatus());
-        }
-                
-        // Overdraft limiti ile birlikte kullanılabilir limiti hesapla
-        BigDecimal overdraftLimit = account.getOverdraftLimit() != null ? account.getOverdraftLimit() : BigDecimal.ZERO;
-        BigDecimal withdrawalLimit = account.getBalance().add(overdraftLimit);
-        
-        // Yeterli bakiye kontrolü
-        if (amount.compareTo(withdrawalLimit) > 0) {
-            throw new IllegalArgumentException("Insufficient funds for withdrawal");
-        }
-        
         // Yeni bakiyeyi hesapla ve güncelle
         BigDecimal newBalance = account.getBalance().subtract(amount);
         account.setBalance(newBalance);
@@ -311,6 +309,10 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
         try {
             // String olarak gelen durumu enum'a çevir
             AccountStatus newStatus = AccountStatus.valueOf(status.toUpperCase());
+            
+            // İş kurallarını doğrula
+            validator.validateStatusUpdate(account, newStatus);
+            
             // Hesabın durumunu güncelle
             account.setStatus(newStatus);
             // Hesabı kaydet

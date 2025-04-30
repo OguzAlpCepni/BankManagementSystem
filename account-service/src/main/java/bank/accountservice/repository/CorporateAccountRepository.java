@@ -13,4 +13,5 @@ public interface CorporateAccountRepository extends JpaRepository<CorporateAccou
     Optional<CorporateAccount> findByIban(String iban);
     Optional<CorporateAccount> findByTaxNumber(String taxNumber);
     List<CorporateAccount> findByCustomerId(Long customerId);
+    long countByCustomerId(Long customerId);
 }

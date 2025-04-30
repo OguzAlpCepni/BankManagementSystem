@@ -6,8 +6,10 @@ import bank.accountservice.dto.response.IndividualAccountResponse;
 import bank.accountservice.dto.response.TransactionResponse;
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.entity.IndividualAccount;
+import bank.accountservice.exception.BusinessRuleException;
 import bank.accountservice.repository.IndividualAccountRepository;
 import bank.accountservice.service.IndividualAccountService;
+import bank.accountservice.validation.AccountBusinessRuleValidator;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
@@ -31,10 +33,20 @@ import java.util.stream.Collectors;
 public class IndividualAccountServiceImpl implements IndividualAccountService {
 
     private final IndividualAccountRepository individualAccountRepository;
+    private final AccountBusinessRuleValidator validator;
+    
+    // Business Rules için sabitler
+    private static final BigDecimal MINIMUM_INITIAL_BALANCE = new BigDecimal("100.00");
+    private static final BigDecimal MAXIMUM_DAILY_WITHDRAWAL = new BigDecimal("5000.00");
+    private static final BigDecimal MAXIMUM_OVERDRAFT_LIMIT = new BigDecimal("1000.00");
+    private static final int MAXIMUM_ACCOUNTS_PER_CUSTOMER = 5;
 
     @Override
     @Transactional
     public IndividualAccountResponse createAccount(CreateIndividualAccountRequest request) {
+        // İş kurallarını doğrula
+        validator.validateCreateAccount(request);
+
         // Yeni hesap nesnesi oluştur
         IndividualAccount account = new IndividualAccount();
 
@@ -281,20 +293,9 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
         IndividualAccount account = individualAccountRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
         
-        // Hesap durumu kontrolü
-        if (account.getStatus() != AccountStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot withdraw from an account with status: " + account.getStatus());
-        }
+        // İş kurallarını doğrula
+        validator.validateWithdrawal(account, amount);
                 
-        // Overdraft limiti ile birlikte kullanılabilir limiti hesapla
-        BigDecimal overdraftLimit = account.getOverdraftLimit() != null ? account.getOverdraftLimit() : BigDecimal.ZERO;
-        BigDecimal withdrawalLimit = account.getBalance().add(overdraftLimit);
-        
-        // Yeterli bakiye kontrolü
-        if (amount.compareTo(withdrawalLimit) > 0) {
-            throw new IllegalArgumentException("Insufficient funds for withdrawal");
-        }
-        
         // Yeni bakiyeyi hesapla ve güncelle
         BigDecimal newBalance = account.getBalance().subtract(amount);
         account.setBalance(newBalance);
@@ -322,6 +323,10 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
         try {
             // String olarak gelen durumu enum'a çevir
             AccountStatus newStatus = AccountStatus.valueOf(status.toUpperCase());
+            
+            // İş kurallarını doğrula
+            validator.validateStatusUpdate(account, newStatus);
+            
             // Hesabın durumunu güncelle
             account.setStatus(newStatus);
             // Hesabı kaydet

@@ -1,0 +1,20 @@
+package bank.accountservice.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+/**
+ * İş kuralı ihlallerinde fırlatılan özel hata sınıfı.
+ * HTTP 400 Bad Request durum koduyla yanıt döndürür.
+ */
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class BusinessRuleException extends RuntimeException {
+
+    public BusinessRuleException(String message) {
+        super(message);
+    }
+
+    public BusinessRuleException(String message, Throwable cause) {
+        super(message, cause);
+    }
+} 

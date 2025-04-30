@@ -13,4 +13,5 @@ public interface IndividualAccountRepository extends JpaRepository<IndividualAcc
     Optional<IndividualAccount> findByIban(String iban);
     Optional<IndividualAccount> findByIdentityNumber(String identityNumber);
     List<IndividualAccount> findByCustomerId(Long customerId);
+    long countByCustomerId(Long customerId);
 }
