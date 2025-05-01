@@ -14,7 +14,7 @@ public interface IndividualAccountService {
     IndividualAccountResponse createAccount(CreateIndividualAccountRequest request);
     IndividualAccountResponse getAccountById(UUID id);
     List<IndividualAccountResponse> getAllAccounts();
-    List<IndividualAccountResponse> getAccountsByCustomerId(Long customerId);
+    List<IndividualAccountResponse> getAccountsByCustomerId(UUID customerId);
     IndividualAccountResponse getAccountByIban(String iban);
     IndividualAccountResponse updateAccountDetails(UUID id, IndividualAccountDto accountDto);
     // Belirtilen hesaba para yatırır ve güncellenmiş entity'i döner

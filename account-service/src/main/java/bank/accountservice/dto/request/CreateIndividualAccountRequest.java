@@ -9,13 +9,13 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 public class CreateIndividualAccountRequest {
-    
-
     
     @NotNull(message = "Account type is required")
     private AccountType type;
@@ -31,7 +31,7 @@ public class CreateIndividualAccountRequest {
     private BigDecimal overdraftLimit;
     
     @NotNull(message = "Customer ID is required")
-    private Long customerId;
+    private UUID customerId;
     
     @NotBlank(message = "Identity number is required")
     private String identityNumber;

@@ -38,7 +38,7 @@ public class CorporateAccountController {
     }
 
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<CorporateAccountResponse>> getAccountsByCustomerId(@PathVariable Long customerId) {
+    public ResponseEntity<List<CorporateAccountResponse>> getAccountsByCustomerId(@PathVariable UUID customerId) {
         return ResponseEntity.ok(corporateAccountService.getAccountsByCustomerId(customerId));
     }
 

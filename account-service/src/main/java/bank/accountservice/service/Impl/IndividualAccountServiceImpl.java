@@ -6,10 +6,10 @@ import bank.accountservice.dto.response.IndividualAccountResponse;
 import bank.accountservice.dto.response.TransactionResponse;
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.entity.IndividualAccount;
-import bank.accountservice.exception.BusinessRuleException;
 import bank.accountservice.repository.IndividualAccountRepository;
 import bank.accountservice.service.IndividualAccountService;
 import bank.accountservice.validation.AccountBusinessRuleValidator;
+import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
@@ -34,19 +34,13 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
 
     private final IndividualAccountRepository individualAccountRepository;
     private final AccountBusinessRuleValidator validator;
-    
-    // Business Rules için sabitler
-    private static final BigDecimal MINIMUM_INITIAL_BALANCE = new BigDecimal("100.00");
-    private static final BigDecimal MAXIMUM_DAILY_WITHDRAWAL = new BigDecimal("5000.00");
-    private static final BigDecimal MAXIMUM_OVERDRAFT_LIMIT = new BigDecimal("1000.00");
-    private static final int MAXIMUM_ACCOUNTS_PER_CUSTOMER = 5;
 
     @Override
     @Transactional
     public IndividualAccountResponse createAccount(CreateIndividualAccountRequest request) {
         // İş kurallarını doğrula
         validator.validateCreateAccount(request);
-
+        // customerId başka birisininkiyle aynı olamaz buraya yaz
         // Yeni hesap nesnesi oluştur
         IndividualAccount account = new IndividualAccount();
 
@@ -73,8 +67,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
     @Override
     public IndividualAccountResponse getAccountById(UUID id) {
         IndividualAccount account = individualAccountRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
-            
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         return convertToResponse(account);
     }
 
@@ -93,7 +86,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
      * @return Müşteriye ait hesapların listesi
      */
     @Override
-    public List<IndividualAccountResponse> getAccountsByCustomerId(Long customerId) {
+    public List<IndividualAccountResponse> getAccountsByCustomerId(UUID customerId) {
         List<IndividualAccount> accounts = individualAccountRepository.findByCustomerId(customerId);
         return accounts.stream()
                 .map(this::convertToResponse)
@@ -103,7 +96,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
     @Override
     public IndividualAccountResponse getAccountByIban(String iban) {
         IndividualAccount account = individualAccountRepository.findByIban(iban)
-            .orElseThrow(() -> new EntityNotFoundException("Account not found with IBAN: " + iban));
+            .orElseThrow(() -> new BusinessException("Account not found with IBAN: " + iban));
             
         return convertToResponse(account);
     }
@@ -121,7 +114,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
     public IndividualAccountResponse updateAccountDetails(UUID id, IndividualAccountDto accountDto) {
         // Hesabı veritabanından bul
         IndividualAccount existingAccount = individualAccountRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+            .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
             
         // Sadece güncellenebilir alanları güncelle (null olmayan alanlar)
         if (accountDto.getIdentityNumber() != null) {
@@ -160,7 +153,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
         // Hesap bakiyesini al, hesap yoksa hata fırlat
         BigDecimal oldBalance = individualAccountRepository.findById(id)
                 .map(IndividualAccount::getBalance)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         try {
             // Para yatırma işlemini gerçekleştir
@@ -205,16 +198,16 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
     private IndividualAccount depositInternal(UUID id, BigDecimal amount) {
         // Miktar kontrolü
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Deposit amount must be positive");
+            throw new BusinessException("Deposit amount must be positive");
         }
         
         // Hesabı bul
         IndividualAccount account = individualAccountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         // Hesap durumu kontrolü
         if (account.getStatus() != AccountStatus.ACTIVE) {
-            throw new IllegalStateException("Cannot deposit to an account with status: " + account.getStatus());
+            throw new BusinessException("Cannot deposit to an account with status: " + account.getStatus());
         }
                 
         // Yeni bakiyeyi hesapla ve güncelle
@@ -241,7 +234,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
         // Hesap bakiyesini al, hesap yoksa hata fırlat
         BigDecimal oldBalance = individualAccountRepository.findById(id)
                 .map(IndividualAccount::getBalance)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         try {
             // Para çekme işlemini gerçekleştir
@@ -259,7 +252,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
             response.setStatus("SUCCESS");
             response.setMessage("Withdrawal completed successfully");
             return response;
-        } catch (Exception e) {
+        } catch (BusinessException e) {
             // Hata durumunda başarısız işlem yanıtını oluştur
             TransactionResponse response = new TransactionResponse();
             response.setAccountId(id);
@@ -286,12 +279,12 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
     private IndividualAccount withdrawInternal(UUID id, BigDecimal amount) {
         // Miktar kontrolü
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Withdrawal amount must be positive");
+            throw new BusinessException("Withdrawal amount must be positive");
         }
         
         // Hesabı bul
         IndividualAccount account = individualAccountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         // İş kurallarını doğrula
         validator.validateWithdrawal(account, amount);
@@ -318,7 +311,7 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
     public IndividualAccountResponse updateAccountStatus(UUID id, String status) {
         // Hesabı bul
         IndividualAccount account = individualAccountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
                 
         try {
             // String olarak gelen durumu enum'a çevir
@@ -334,8 +327,8 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
             
             // Güncellenmiş hesabı yanıt nesnesine dönüştür ve döndür
             return convertToResponse(account);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid account status: " + status + ". Valid values are: ACTIVE, INACTIVE, BLOCKED, CLOSED");
+        } catch (BusinessException e) {
+            throw new BusinessException("Invalid account status: " + status + ". Valid values are: ACTIVE, INACTIVE, BLOCKED, CLOSED");
         }
     }
     

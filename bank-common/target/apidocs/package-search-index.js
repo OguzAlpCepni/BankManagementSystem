@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"io.github.oguzalpcepni"}];updateSearchResults();
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"io.github.oguzalpcepni"},{"l":"io.github.oguzalpcepni.exceptions"},{"l":"io.github.oguzalpcepni.exceptions.result"},{"l":"io.github.oguzalpcepni.exceptions.type"}];updateSearchResults();

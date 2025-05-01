@@ -24,7 +24,7 @@ public class CorporateAccountResponse {
     private BigDecimal balance;
     private BigDecimal overdraftLimit;
     private CurrencyType currency;
-    private Long customerId;
+    private UUID customerId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     

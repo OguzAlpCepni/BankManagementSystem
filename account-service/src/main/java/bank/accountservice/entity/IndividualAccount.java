@@ -16,7 +16,7 @@ import lombok.Setter;
 @Table(name = "individual_account")
 public class IndividualAccount extends Account{
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String identityNumber;
 
     @Column(nullable = false)

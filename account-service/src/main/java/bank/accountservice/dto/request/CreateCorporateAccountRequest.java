@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -30,7 +31,7 @@ public class CreateCorporateAccountRequest {
     private BigDecimal overdraftLimit;
     
     @NotNull(message = "Customer ID is required")
-    private Long customerId;
+    private UUID customerId;
     
     @NotBlank(message = "Tax number is required")
     private String taxNumber;

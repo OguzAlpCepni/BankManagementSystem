@@ -12,6 +12,6 @@ import java.util.UUID;
 public interface IndividualAccountRepository extends JpaRepository<IndividualAccount, UUID> {
     Optional<IndividualAccount> findByIban(String iban);
     Optional<IndividualAccount> findByIdentityNumber(String identityNumber);
-    List<IndividualAccount> findByCustomerId(Long customerId);
-    long countByCustomerId(Long customerId);
+    List<IndividualAccount> findByCustomerId(UUID customerId);
+    long countByCustomerId(UUID customerId);
 }

@@ -13,7 +13,7 @@ public interface CorporateAccountService {
     CorporateAccountResponse createAccount(CreateCorporateAccountRequest request);
     CorporateAccountResponse getAccountById(UUID id);
     List<CorporateAccountResponse> getAllAccounts();
-    List<CorporateAccountResponse> getAccountsByCustomerId(Long customerId);
+    List<CorporateAccountResponse> getAccountsByCustomerId(UUID customerId);
     CorporateAccountResponse getAccountByIban(String iban);
     CorporateAccountResponse getAccountByTaxNumber(String taxNumber);
     CorporateAccountResponse updateAccountDetails(UUID id, CorporateAccountDto accountDto);

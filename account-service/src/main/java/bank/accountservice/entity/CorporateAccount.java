@@ -16,7 +16,7 @@ import lombok.Setter;
 @AllArgsConstructor
 public class CorporateAccount extends Account{
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String taxNumber;
 
     @Column(nullable = false)

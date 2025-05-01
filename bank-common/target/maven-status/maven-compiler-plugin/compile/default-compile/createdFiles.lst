@@ -1,1 +1,6 @@
+io\github\oguzalpcepni\exceptions\GlobalExceptionHandler.class
+io\github\oguzalpcepni\exceptions\result\BusinessExceptionResult.class
+io\github\oguzalpcepni\exceptions\type\BusinessException.class
+io\github\oguzalpcepni\exceptions\result\ExceptionResult.class
+io\github\oguzalpcepni\exceptions\result\ValidationExceptionResult.class
 io\github\oguzalpcepni\Main.class

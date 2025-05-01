@@ -6,10 +6,10 @@ import bank.accountservice.dto.response.CorporateAccountResponse;
 import bank.accountservice.dto.response.TransactionResponse;
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.entity.CorporateAccount;
-import bank.accountservice.exception.BusinessRuleException;
 import bank.accountservice.repository.CorporateAccountRepository;
 import bank.accountservice.service.CorporateAccountService;
 import bank.accountservice.validation.CorporateAccountBusinessRuleValidator;
+import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang.RandomStringUtils;
@@ -79,7 +79,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
     }
 
     @Override
-    public List<CorporateAccountResponse> getAccountsByCustomerId(Long customerId) {
+    public List<CorporateAccountResponse> getAccountsByCustomerId(UUID customerId) {
         List<CorporateAccount> accounts = corporateAccountRepository.findByCustomerId(customerId);
         return accounts.stream()
                 .map(this::convertToResponse)
@@ -117,7 +117,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
             
         // Vergi numarası validasyonu
         if (accountDto.getTaxNumber() != null && !accountDto.getTaxNumber().matches("\\d{10}")) {
-            throw new BusinessRuleException("Tax number must be 10 digits");
+            throw new BusinessException("Tax number must be 10 digits");
         }
             
         // Sadece güncellenebilir alanları güncelle (null olmayan alanlar)
@@ -134,7 +134,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
             // Overdraft limiti kontrolü
             BigDecimal maxOverdraftLimit = new BigDecimal("10000.00");
             if (accountDto.getOverdraftLimit().compareTo(maxOverdraftLimit) > 0) {
-                throw new BusinessRuleException("Overdraft limit cannot exceed " + maxOverdraftLimit);
+                throw new BusinessException("Overdraft limit cannot exceed " + maxOverdraftLimit);
             }
             existingAccount.setOverdraftLimit(accountDto.getOverdraftLimit());
         }
@@ -161,7 +161,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
     public TransactionResponse depositAmount(UUID id, BigDecimal amount) {
         // Hesap bakiyesini al, hesap yoksa hata fırlat
         CorporateAccount account = corporateAccountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         BigDecimal oldBalance = account.getBalance();
         
@@ -184,7 +184,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
             response.setStatus("SUCCESS");
             response.setMessage("Deposit completed successfully");
             return response;
-        } catch (Exception e) {
+        } catch (BusinessException e) {
             // Hata durumunda başarısız işlem yanıtını oluştur
             TransactionResponse response = new TransactionResponse();
             response.setAccountId(id);
@@ -231,7 +231,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
     public TransactionResponse withdrawAmount(UUID id, BigDecimal amount) {
         // Hesabı bul, yoksa hata fırlat
         CorporateAccount account = corporateAccountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         BigDecimal oldBalance = account.getBalance();
         
@@ -254,7 +254,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
             response.setStatus("SUCCESS");
             response.setMessage("Withdrawal completed successfully");
             return response;
-        } catch (Exception e) {
+        } catch (BusinessException e) {
             // Hata durumunda başarısız işlem yanıtını oluştur
             TransactionResponse response = new TransactionResponse();
             response.setAccountId(id);
@@ -280,7 +280,7 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
     private CorporateAccount withdrawInternal(CorporateAccount account, BigDecimal amount) {
         // Miktar kontrolü
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Withdrawal amount must be positive");
+            throw new BusinessException("Withdrawal amount must be positive");
         }
         
         // Yeni bakiyeyi hesapla ve güncelle
@@ -296,15 +296,15 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
      * @param id Durumu değiştirilecek hesabın ID'si
      * @param status Yeni durum (ACTIVE, INACTIVE, BLOCKED, CLOSED)
      * @return Güncellenmiş hesabın yanıtı
-     * @throws EntityNotFoundException Hesap bulunamazsa fırlatılır
-     * @throws IllegalArgumentException Geçersiz hesap durumu belirtilirse fırlatılır
+     * @throws BusinessException Hesap bulunamazsa fırlatılır
+     * @throws BusinessException Geçersiz hesap durumu belirtilirse fırlatılır
      */
     @Override
     @Transactional
     public CorporateAccountResponse updateAccountStatus(UUID id, String status) {
         // Hesabı bul
         CorporateAccount account = corporateAccountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
                 
         try {
             // String olarak gelen durumu enum'a çevir
@@ -320,8 +320,8 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
             
             // Güncellenmiş hesabı yanıt nesnesine dönüştür ve döndür
             return convertToResponse(account);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid account status: " + status + ". Valid values are: ACTIVE, INACTIVE, BLOCKED, CLOSED");
+        } catch (BusinessException e) {
+            throw new BusinessException("Invalid account status: " + status + ". Valid values are: ACTIVE, INACTIVE, BLOCKED, CLOSED");
         }
     }
     

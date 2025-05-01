@@ -38,7 +38,7 @@ public class IndividualAccountController {
     }
 
     @GetMapping("/customer/{customerId}")
-    public ResponseEntity<List<IndividualAccountResponse>> getAccountsByCustomerId(@PathVariable Long customerId) {
+    public ResponseEntity<List<IndividualAccountResponse>> getAccountsByCustomerId(@PathVariable UUID customerId) {
         return ResponseEntity.ok(individualAccountService.getAccountsByCustomerId(customerId));
     }
 
@@ -53,7 +53,7 @@ public class IndividualAccountController {
             @Valid @RequestBody IndividualAccountDto accountDto) {
         return ResponseEntity.ok(individualAccountService.updateAccountDetails(id, accountDto));
     }
-
+    // hesap id sine göre hesaba para yatırma
     @PostMapping("/{id}/deposit")
     public ResponseEntity<TransactionResponse> depositAmount(
             @PathVariable UUID id,
