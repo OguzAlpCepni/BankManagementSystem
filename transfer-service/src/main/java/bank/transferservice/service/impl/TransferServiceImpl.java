@@ -1,5 +1,6 @@
 package bank.transferservice.service.impl;
 
+import bank.transferservice.client.AccountServiceClient;
 import bank.transferservice.dto.TransferRequest;
 import bank.transferservice.dto.TransferResponse;
 import bank.transferservice.dto.event.TransferEvent;
@@ -9,11 +10,14 @@ import bank.transferservice.entity.TransferType;
 import bank.transferservice.repository.TransferRepository;
 import bank.transferservice.service.KafkaProducerService;
 import bank.transferservice.service.TransferService;
+import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -26,37 +30,33 @@ public class TransferServiceImpl implements TransferService {
 
     private final TransferRepository transferRepository;
     private final KafkaProducerService kafkaProducerService;
+    private final AccountServiceClient accountServiceClient;
 
     @Override
     @Transactional
     public TransferResponse initiateTransfer(TransferRequest transferRequest) {
         log.info("Initiating transfer: {}", transferRequest);
-        
-        // Validate account balance
-        boolean isBalanceValid = accountServiceClient.validateAccountBalance(
-                transferRequest.getSourceAccountId(), transferRequest.getAmount());
-        
-        if (!isBalanceValid) {
-            log.error("Insufficient balance for transfer");
-            throw new RuntimeException("Insufficient balance for transfer");
-        }
+
+        //Kaynak hesapta yeterli bakiye kontrolü
+        validateAccountBalance(transferRequest.getSourceAccountId(),transferRequest.getAmount());
         
         // Create transfer entity
-        Transfer transfer = Transfer.builder()
-                .id(UUID.randomUUID())
-                .sourceAccountId(transferRequest.getSourceAccountId())
-                .targetAccountId(transferRequest.getTargetAccountId())
-                .sourceIban(transferRequest.getSourceIban())
-                .targetIban(transferRequest.getTargetIban())
-                .amount(transferRequest.getAmount())
-                .currency(transferRequest.getCurrency())
-                .transferType(transferRequest.getTransferType())
-                .status(TransferStatus.PENDING)
-                .description(transferRequest.getDescription())
-                .transactionReference(generateTransactionReference())
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
+        Transfer transfer = new Transfer();
+        transfer.setId(UUID.randomUUID());
+        transfer.setSourceAccountId(transferRequest.getSourceAccountId());
+        transfer.setTargetAccountId(transferRequest.getTargetAccountId());
+        transfer.setSourceIban(transferRequest.getSourceIban());
+        transfer.setTargetIban(transferRequest.getTargetIban());
+        transfer.setAmount(transferRequest.getAmount());
+        transfer.setCurrency(transferRequest.getCurrency());
+        transfer.setType(resolveTransferType(transferRequest));
+        transfer.setStatus(TransferStatus.PENDING);
+        transfer.setDescription(transferRequest.getDescription());
+        transfer.setTransactionReference(generateTransactionReference());
+        transfer.setCreatedAt(LocalDateTime.now());
+        transfer.setUpdatedAt(LocalDateTime.now());
+        transfer.setSourceAccountDebited(false);
+        transfer.setTargetAccountCredited(false);
         
         transferRepository.save(transfer);
         log.info("Transfer created: {}", transfer);
@@ -72,7 +72,7 @@ public class TransferServiceImpl implements TransferService {
         log.info("Getting transfer by ID: {}", transferId);
         
         Transfer transfer = transferRepository.findById(transferId)
-                .orElseThrow(() -> new RuntimeException("Transfer not found with ID: " + transferId));
+                .orElseThrow(() -> new BusinessException("Transfer not found with ID: " + transferId));
         
         return mapToTransferResponse(transfer);
     }
@@ -138,10 +138,10 @@ public class TransferServiceImpl implements TransferService {
         log.info("Cancelling transfer with ID: {}", transferId);
         
         Transfer transfer = transferRepository.findById(transferId)
-                .orElseThrow(() -> new RuntimeException("Transfer not found with ID: " + transferId));
+                .orElseThrow(() -> new BusinessException("Transfer not found with ID: " + transferId));
         
         if (transfer.getStatus() != TransferStatus.PENDING) {
-            throw new RuntimeException("Only pending transfers can be cancelled");
+            throw new BusinessException("Only pending transfers can be cancelled");
         }
         
         transfer.setStatus(TransferStatus.CANCELLED);
@@ -161,7 +161,7 @@ public class TransferServiceImpl implements TransferService {
         log.info("Updating transfer status: {} for transfer ID: {}", status, transferId);
         
         Transfer transfer = transferRepository.findById(transferId)
-                .orElseThrow(() -> new RuntimeException("Transfer not found with ID: " + transferId));
+                .orElseThrow(() -> new BusinessException("Transfer not found with ID: " + transferId));
         
         transfer.setStatus(status);
         transfer.setUpdatedAt(LocalDateTime.now());
@@ -176,7 +176,7 @@ public class TransferServiceImpl implements TransferService {
     
     private void processTransfer(Transfer transfer) {
         // Based on transfer type, initiate the appropriate process
-        TransferType transferType = transfer.getTransferType();
+        TransferType transferType = transfer.getType();
         
         switch (transferType) {
             case INTERNAL:
@@ -192,7 +192,7 @@ public class TransferServiceImpl implements TransferService {
                 processFastTransfer(transfer);
                 break;
             default:
-                throw new RuntimeException("Unsupported transfer type: " + transferType);
+                throw new BusinessException("Unsupported transfer type: " + transferType);
         }
     }
     
@@ -200,174 +200,206 @@ public class TransferServiceImpl implements TransferService {
         log.info("Processing internal transfer: {}", transfer.getId());
         
         try {
-            // Debit source account
-            boolean debitSuccess = accountServiceClient.debitAccount(
+            // 1. Kaynak hesaptan para çek
+            ResponseEntity<Boolean> debitResponse = accountServiceClient.debitAccount(
                     transfer.getSourceAccountId(), 
                     transfer.getAmount(), 
                     "Internal Transfer - " + transfer.getTransactionReference(), 
                     transfer.getId());
-            
-            if (!debitSuccess) {
-                throw new RuntimeException("Failed to debit source account");
+            //  çekme başarısızsa hata fırlat
+            if (debitResponse.getBody() == null || !debitResponse.getBody()) {
+                throw new BusinessException("Failed to debit source account");
             }
             
-            // Credit target account
-            boolean creditSuccess = accountServiceClient.creditAccount(
+            // Update transfer to indicate source account has been debited
+            transfer.setSourceAccountDebited(true);
+            transferRepository.save(transfer);
+            
+            // Send event for saga orchestration
+            sendTransferEvent(transfer);
+
+            // 3. Hedef hesaba para yatır
+            ResponseEntity<Boolean> creditResponse = accountServiceClient.creditAccount(
                     transfer.getTargetAccountId(), 
                     transfer.getAmount(), 
                     "Internal Transfer - " + transfer.getTransactionReference(), 
                     transfer.getId());
             
-            if (!creditSuccess) {
-                // Compensate by refunding the source account
+            if (creditResponse.getBody() == null || !creditResponse.getBody()) {
+                // Compensating transaction - refund the source account
                 accountServiceClient.creditAccount(
                         transfer.getSourceAccountId(), 
                         transfer.getAmount(), 
                         "Refund - Internal Transfer Failed - " + transfer.getTransactionReference(), 
                         transfer.getId());
                 
-                throw new RuntimeException("Failed to credit target account");
+                transfer.setSourceAccountDebited(false);
+                throw new BusinessException("Failed to credit target account");
             }
             
-            // Update transfer status
+            // Update transfer to indicate target account has been credited
+            transfer.setTargetAccountCredited(true);
+            
+            // Update transfer status to completed
             transfer.setStatus(TransferStatus.COMPLETED);
+            transfer.setCompletedAt(LocalDateTime.now());
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
             // Send transfer completed event
             sendTransferEvent(transfer);
             
-        } catch (Exception e) {
+        } catch (BusinessException e) {
             log.error("Error processing internal transfer: {}", e.getMessage());
             transfer.setStatus(TransferStatus.FAILED);
+            transfer.setErrorMessage(e.getMessage());
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
             // Send transfer failed event
             sendTransferEvent(transfer);
             
-            throw new RuntimeException("Internal transfer processing failed: " + e.getMessage());
+            throw new BusinessException("Internal transfer processing failed: " + e.getMessage());
         }
     }
     
     private void processEftTransfer(Transfer transfer) {
         log.info("Processing EFT transfer: {}", transfer.getId());
         
-        // Implement EFT transfer logic
-        // For now, just debit the account and update status to IN_PROGRESS
-        
         try {
-            boolean debitSuccess = accountServiceClient.debitAccount(
+            // Debit source account using Feign Client
+            ResponseEntity<Boolean> debitResponse = accountServiceClient.debitAccount(
                     transfer.getSourceAccountId(), 
                     transfer.getAmount(), 
                     "EFT Transfer - " + transfer.getTransactionReference(), 
                     transfer.getId());
             
-            if (!debitSuccess) {
-                throw new RuntimeException("Failed to debit source account for EFT");
+            if (debitResponse.getBody() == null || !debitResponse.getBody()) {
+                throw new BusinessException("Failed to debit source account for EFT");
             }
             
-            transfer.setStatus(TransferStatus.IN_PROGRESS);
+            // In real-world scenario, we would initiate an EFT via external banking API
+            // For now, just mark as pending and emit event
+            
+            transfer.setSourceAccountDebited(true);
+            transfer.setStatus(TransferStatus.PENDING);
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
-            // Send the transfer event for further processing
+            // Send the transfer event for further processing by Transaction Management Service
             sendTransferEvent(transfer);
             
         } catch (Exception e) {
             log.error("Error processing EFT transfer: {}", e.getMessage());
             transfer.setStatus(TransferStatus.FAILED);
+            transfer.setErrorMessage(e.getMessage());
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
             sendTransferEvent(transfer);
             
-            throw new RuntimeException("EFT transfer processing failed: " + e.getMessage());
+            throw new BusinessException("EFT transfer processing failed: " + e.getMessage());
         }
     }
     
     private void processSwiftTransfer(Transfer transfer) {
         log.info("Processing SWIFT transfer: {}", transfer.getId());
         
-        // Similar to EFT with SWIFT-specific logic
         try {
-            boolean debitSuccess = accountServiceClient.debitAccount(
+            // Debit source account using Feign Client
+            ResponseEntity<Boolean> debitResponse = accountServiceClient.debitAccount(
                     transfer.getSourceAccountId(), 
                     transfer.getAmount(), 
                     "SWIFT Transfer - " + transfer.getTransactionReference(), 
                     transfer.getId());
             
-            if (!debitSuccess) {
-                throw new RuntimeException("Failed to debit source account for SWIFT");
+            if (debitResponse.getBody() == null || !debitResponse.getBody()) {
+                throw new BusinessException("Failed to debit source account for SWIFT");
             }
             
-            transfer.setStatus(TransferStatus.IN_PROGRESS);
+            // In real-world scenario, we would initiate a SWIFT transfer via external banking API
+            // For now, just mark as pending and emit event
+            
+            transfer.setSourceAccountDebited(true);
+            transfer.setStatus(TransferStatus.PENDING);
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
             sendTransferEvent(transfer);
             
-        } catch (Exception e) {
+        } catch (BusinessException e) {
             log.error("Error processing SWIFT transfer: {}", e.getMessage());
             transfer.setStatus(TransferStatus.FAILED);
+            transfer.setErrorMessage(e.getMessage());
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
             sendTransferEvent(transfer);
             
-            throw new RuntimeException("SWIFT transfer processing failed: " + e.getMessage());
+            throw new BusinessException("SWIFT transfer processing failed: " + e.getMessage());
         }
     }
     
     private void processFastTransfer(Transfer transfer) {
         log.info("Processing FAST transfer: {}", transfer.getId());
         
-        // Fast payment system transfer logic
         try {
-            boolean debitSuccess = accountServiceClient.debitAccount(
+            // Debit source account using Feign Client
+            ResponseEntity<Boolean> debitResponse = accountServiceClient.debitAccount(
                     transfer.getSourceAccountId(), 
                     transfer.getAmount(), 
                     "FAST Transfer - " + transfer.getTransactionReference(), 
                     transfer.getId());
             
-            if (!debitSuccess) {
-                throw new RuntimeException("Failed to debit source account for FAST");
+            if (debitResponse.getBody() == null || !debitResponse.getBody()) {
+                throw new BusinessException("Failed to debit source account for FAST");
             }
             
-            transfer.setStatus(TransferStatus.IN_PROGRESS);
+            // In real-world scenario, we would initiate a FAST transfer via external banking API
+            // For now, just mark as pending and emit event
+            
+            transfer.setSourceAccountDebited(true);
+            transfer.setStatus(TransferStatus.PENDING);
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
             sendTransferEvent(transfer);
             
-        } catch (Exception e) {
+        } catch (BusinessException e) {
             log.error("Error processing FAST transfer: {}", e.getMessage());
             transfer.setStatus(TransferStatus.FAILED);
+            transfer.setErrorMessage(e.getMessage());
             transfer.setUpdatedAt(LocalDateTime.now());
             transferRepository.save(transfer);
             
             sendTransferEvent(transfer);
             
-            throw new RuntimeException("FAST transfer processing failed: " + e.getMessage());
+            throw new BusinessException("FAST transfer processing failed: " + e.getMessage());
         }
     }
     
     private void sendTransferEvent(Transfer transfer) {
-        TransferEvent transferEvent = TransferEvent.builder()
-                .transferId(transfer.getId())
-                .sourceAccountId(transfer.getSourceAccountId())
-                .targetAccountId(transfer.getTargetAccountId())
-                .sourceIban(transfer.getSourceIban())
-                .targetIban(transfer.getTargetIban())
-                .amount(transfer.getAmount())
-                .currency(transfer.getCurrency())
-                .transferType(transfer.getTransferType())
-                .status(transfer.getStatus())
-                .description(transfer.getDescription())
-                .transactionReference(transfer.getTransactionReference())
-                .build();
+        TransferEvent transferEvent = new TransferEvent();
+        transferEvent.setTransferId(transfer.getId());
+        transferEvent.setSourceAccountId(transfer.getSourceAccountId());
+        transferEvent.setTargetAccountId(transfer.getTargetAccountId());
+        transferEvent.setSourceIban(transfer.getSourceIban());
+        transferEvent.setTargetIban(transfer.getTargetIban());
+        transferEvent.setAmount(transfer.getAmount());
+        transferEvent.setCurrency(transfer.getCurrency());
+        transferEvent.setType(transfer.getType());
+        transferEvent.setStatus(transfer.getStatus());
+        transferEvent.setDescription(transfer.getDescription());
+        transferEvent.setTransactionReference(transfer.getTransactionReference());
+        transferEvent.setSourceAccountDebited(transfer.getSourceAccountDebited());
+        transferEvent.setTargetAccountCredited(transfer.getTargetAccountCredited());
         
         kafkaProducerService.sendTransferEvent(transferEvent);
+    }
+    
+    private TransferType resolveTransferType(TransferRequest request) {
+        // Basit mantık: DTO'daki transferType'ı entity'deki type'a çeviriyoruz
+        return TransferType.valueOf(request.getTransferType().name());
     }
     
     private String generateTransactionReference() {
@@ -375,20 +407,32 @@ public class TransferServiceImpl implements TransferService {
     }
     
     private TransferResponse mapToTransferResponse(Transfer transfer) {
-        return TransferResponse.builder()
-                .id(transfer.getId())
-                .sourceAccountId(transfer.getSourceAccountId())
-                .targetAccountId(transfer.getTargetAccountId())
-                .sourceIban(transfer.getSourceIban())
-                .targetIban(transfer.getTargetIban())
-                .amount(transfer.getAmount())
-                .currency(transfer.getCurrency())
-                .transferType(transfer.getTransferType())
-                .status(transfer.getStatus())
-                .description(transfer.getDescription())
-                .transactionReference(transfer.getTransactionReference())
-                .createdAt(transfer.getCreatedAt())
-                .updatedAt(transfer.getUpdatedAt())
-                .build();
+        TransferResponse response = new TransferResponse();
+        response.setId(transfer.getId());
+        response.setSourceAccountId(transfer.getSourceAccountId());
+        response.setTargetAccountId(transfer.getTargetAccountId());
+        response.setSourceIban(transfer.getSourceIban());
+        response.setTargetIban(transfer.getTargetIban());
+        response.setAmount(transfer.getAmount());
+        response.setCurrency(transfer.getCurrency());
+        response.setTransferType(transfer.getType());
+        response.setStatus(transfer.getStatus());
+        response.setDescription(transfer.getDescription());
+        response.setTransactionReference(transfer.getTransactionReference());
+        response.setCreatedAt(transfer.getCreatedAt());
+        response.setUpdatedAt(transfer.getUpdatedAt());
+        return response;
+    }
+    private void validateAccountBalance(UUID sourceAccountId, BigDecimal amount) {
+        log.debug("Validating balance for account: {} with amount: {}", sourceAccountId, amount);
+        ResponseEntity<Boolean> balanceCheckResponse = accountServiceClient.checkBalance(
+                sourceAccountId,
+                amount
+        );
+
+        if (balanceCheckResponse.getBody() == null || !balanceCheckResponse.getBody()) {
+            log.error("Insufficient balance in account: {} for amount: {}", sourceAccountId, amount);
+            throw new BusinessException("Insufficient balance for transfer");
+        }
     }
 } 

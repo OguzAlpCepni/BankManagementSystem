@@ -1,0 +1,32 @@
+package io.github.oguzalpcepni.event;
+
+
+import io.github.oguzalpcepni.event.enums.TransferStatus;
+import io.github.oguzalpcepni.event.enums.TransferType;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+import java.util.UUID;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class TransferEvent {
+    private UUID transferId;
+    private UUID sourceAccountId;
+    private UUID targetAccountId;
+    private String sourceIban;
+    private String targetIban;
+    private BigDecimal amount;
+    private String currency;
+    private TransferType type;
+    private TransferStatus status;
+    private String description;
+    private String transactionReference;
+    private Boolean sourceAccountDebited;
+    private Boolean targetAccountCredited;
+} 

@@ -1,4 +1,8 @@
 io.github.oguzalpcepni
+io.github.oguzalpcepni.dto.accountdto
+io.github.oguzalpcepni.dto.enums
+io.github.oguzalpcepni.event
+io.github.oguzalpcepni.event.enums
 io.github.oguzalpcepni.exceptions
 io.github.oguzalpcepni.exceptions.result
 io.github.oguzalpcepni.exceptions.type
