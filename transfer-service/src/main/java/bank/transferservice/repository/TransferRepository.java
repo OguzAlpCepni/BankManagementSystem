@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
-@Repository
+
 public interface TransferRepository extends JpaRepository<Transfer, UUID> {
     
     List<Transfer> findBySourceIban(String sourceIban);
@@ -17,9 +17,9 @@ public interface TransferRepository extends JpaRepository<Transfer, UUID> {
     
     List<Transfer> findByStatus(TransferStatus status);
     
-    List<Transfer> findBySourceAccountId(String sourceAccountId);
+    List<Transfer> findBySourceAccountId(UUID sourceAccountId);
     
-    List<Transfer> findByTargetAccountId(String targetAccountId);
+    List<Transfer> findByTargetAccountId(UUID targetAccountId);
     
     List<Transfer> findByTransactionReference(String transactionReference);
 } 

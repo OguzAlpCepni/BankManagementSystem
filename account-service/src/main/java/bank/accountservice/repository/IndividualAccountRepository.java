@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
+
 public interface IndividualAccountRepository extends JpaRepository<IndividualAccount, UUID> {
     Optional<IndividualAccount> findByIban(String iban);
     Optional<IndividualAccount> findByIdentityNumber(String identityNumber);

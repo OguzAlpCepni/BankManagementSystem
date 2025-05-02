@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-@Repository
+
 public interface CorporateAccountRepository extends JpaRepository<CorporateAccount, UUID> {
     Optional<CorporateAccount> findByIban(String iban);
     Optional<CorporateAccount> findByTaxNumber(String taxNumber);
