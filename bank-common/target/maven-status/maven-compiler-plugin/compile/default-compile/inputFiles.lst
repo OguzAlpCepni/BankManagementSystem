@@ -10,8 +10,11 @@ C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\exceptions\result\ExceptionResult.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\IndividualAccountResponse.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\enums\TransferStatus.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\enums\TransactionType.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\enums\TransferType.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\TransactionEvent.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\TransferEvent.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\AccountEvent.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\TransactionRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\CreateCorporateAccountRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\TransactionResponse.java
@@ -21,5 +24,6 @@ C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\enums\CurrencyType.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\CreateIndividualAccountRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\exceptions\GlobalExceptionHandler.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\enums\TransactionStatus.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\AccountDto.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\exceptions\result\ValidationExceptionResult.java
