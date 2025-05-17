@@ -1,8 +1,6 @@
 package io.github.oguzalpcepni.dto.accountdto;
 
-import io.github.oguzalpcepni.dto.enums.AccountStatus;
-import io.github.oguzalpcepni.dto.enums.AccountType;
-import io.github.oguzalpcepni.dto.enums.CurrencyType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +15,7 @@ public class AccountSearchRequest {
     private String iban;
     private String identityNumber;
     private String taxNumber;
-    private AccountType type;
-    private AccountStatus status;
-    private CurrencyType currency;
+    private String type;
+    private String status;
+    private String currency;
 } 

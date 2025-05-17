@@ -1,31 +1,31 @@
-package bank.transferservice.dto.response;
+package io.github.oguzalpcepni.dto.transferdto;
 
-import bank.transferservice.entity.TransferStatus;
-import bank.transferservice.entity.TransferType;
+
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TransferResponse {
     private UUID id;
+    private UUID sourceAccountId;
+    private UUID targetAccountId;
     private String sourceIban;
     private String targetIban;
     private BigDecimal amount;
     private String currency;
+    private String transferType;
+    private String status;
     private String description;
-    private TransferType type;
-    private TransferStatus status;
     private String transactionReference;
     private LocalDateTime createdAt;
-    private LocalDateTime completedAt;
-    private String errorMessage;
+    private LocalDateTime updatedAt;
 } 

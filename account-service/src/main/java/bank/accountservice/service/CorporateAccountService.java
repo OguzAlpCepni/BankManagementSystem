@@ -1,9 +1,11 @@
 package bank.accountservice.service;
 
-import bank.accountservice.dto.CorporateAccountDto;
-import bank.accountservice.dto.request.CreateCorporateAccountRequest;
-import bank.accountservice.dto.response.CorporateAccountResponse;
-import bank.accountservice.dto.response.TransactionResponse;
+
+import io.github.oguzalpcepni.dto.accountdto.CorporateAccountDto;
+import io.github.oguzalpcepni.dto.accountdto.CorporateAccountResponse;
+import io.github.oguzalpcepni.dto.accountdto.CreateCorporateAccountRequest;
+import io.github.oguzalpcepni.dto.accountdto.TransactionResponse;
+
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;

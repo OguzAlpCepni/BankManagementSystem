@@ -1,10 +1,10 @@
 package bank.accountservice.service;
 
-import bank.accountservice.dto.IndividualAccountDto;
-import bank.accountservice.dto.request.CreateIndividualAccountRequest;
-import bank.accountservice.dto.response.IndividualAccountResponse;
-import bank.accountservice.dto.response.TransactionResponse;
 
+import io.github.oguzalpcepni.dto.accountdto.CreateIndividualAccountRequest;
+import io.github.oguzalpcepni.dto.accountdto.IndividualAccountDto;
+import io.github.oguzalpcepni.dto.accountdto.IndividualAccountResponse;
+import io.github.oguzalpcepni.dto.accountdto.TransactionResponse;
 
 import java.math.BigDecimal;
 import java.util.List;

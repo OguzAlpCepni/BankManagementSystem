@@ -20,6 +20,7 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
     // Hesap bilgileri
+    private UUID transferId;
     @Column(nullable = false)
     private UUID sourceAccountId;
     

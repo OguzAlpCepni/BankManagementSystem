@@ -1,7 +1,5 @@
 package io.github.oguzalpcepni.event;
 
-import io.github.oguzalpcepni.event.enums.TransactionStatus;
-import io.github.oguzalpcepni.event.enums.TransactionType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,6 +15,7 @@ import java.util.UUID;
 @Builder
 public class TransactionEvent {
     private UUID transactionId;
+    private UUID transferId;
     private UUID sourceAccountId;
     private UUID targetAccountId;
     private String sourceIban;

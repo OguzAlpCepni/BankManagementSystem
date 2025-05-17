@@ -1,7 +1,8 @@
 package bank.transferservice.service;
 
-import bank.transferservice.dto.event.TransferEvent;
+import io.github.oguzalpcepni.event.TransactionEvent;
+import io.github.oguzalpcepni.event.TransferEvent;
 
 public interface TransferProcessorService {
-    void processTransferResponse(TransferEvent transferEvent);
+    void processTransferResponse(TransactionEvent transactionEvent);
 } 

@@ -1,8 +1,7 @@
 package io.github.oguzalpcepni.dto.accountdto;
 
 
-import io.github.oguzalpcepni.dto.enums.AccountType;
-import io.github.oguzalpcepni.dto.enums.CurrencyType;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
@@ -22,10 +21,10 @@ import java.util.UUID;
 public class CreateCorporateAccountRequest {
 
     @NotNull(message = "Account type is required")
-    private AccountType type;
+    private String type;
     
     @NotNull(message = "Currency type is required")
-    private CurrencyType currency;
+    private String currency;
     
     @NotNull(message = "Initial balance is required")
     @DecimalMin(value = "0.0", inclusive = true, message = "Initial balance cannot be negative")

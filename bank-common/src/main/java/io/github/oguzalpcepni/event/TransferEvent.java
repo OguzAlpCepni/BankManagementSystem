@@ -1,8 +1,7 @@
 package io.github.oguzalpcepni.event;
 
 
-import io.github.oguzalpcepni.event.enums.TransferStatus;
-import io.github.oguzalpcepni.event.enums.TransferType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,8 +22,8 @@ public class TransferEvent {
     private String targetIban;
     private BigDecimal amount;
     private String currency;
-    private TransferType type;
-    private TransferStatus status;
+    private String type;
+    private String status;
     private String description;
     private String transactionReference;
     private Boolean sourceAccountDebited;

@@ -1,14 +1,17 @@
 package bank.accountservice.service.Impl;
 
-import bank.accountservice.dto.CorporateAccountDto;
-import bank.accountservice.dto.request.CreateCorporateAccountRequest;
-import bank.accountservice.dto.response.CorporateAccountResponse;
-import bank.accountservice.dto.response.TransactionResponse;
+
 import bank.accountservice.entity.AccountStatus;
+import bank.accountservice.entity.AccountType;
 import bank.accountservice.entity.CorporateAccount;
+import bank.accountservice.entity.CurrencyType;
 import bank.accountservice.repository.CorporateAccountRepository;
 import bank.accountservice.service.CorporateAccountService;
 import bank.accountservice.validation.CorporateAccountBusinessRuleValidator;
+import io.github.oguzalpcepni.dto.accountdto.CorporateAccountDto;
+import io.github.oguzalpcepni.dto.accountdto.CorporateAccountResponse;
+import io.github.oguzalpcepni.dto.accountdto.CreateCorporateAccountRequest;
+import io.github.oguzalpcepni.dto.accountdto.TransactionResponse;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +49,11 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
         
         // İstek nesnesinden gelen bilgileri hesaba aktar
         account.setIban(ibanGenerator());
-        account.setType(request.getType());
+        account.setType(AccountType.valueOf(request.getType()));
         account.setStatus(AccountStatus.ACTIVE); // Yeni hesaplar varsayılan olarak aktiftir
         account.setBalance(request.getInitialBalance());
         account.setOverdraftLimit(request.getOverdraftLimit());
-        account.setCurrency(request.getCurrency());
+        account.setCurrency(CurrencyType.valueOf(request.getCurrency()));
         account.setCustomerId(request.getCustomerId());
         account.setTaxNumber(request.getTaxNumber());
         account.setCompanyName(request.getCompanyName());
@@ -335,11 +338,11 @@ public class CorporateAccountServiceImpl implements CorporateAccountService {
         CorporateAccountResponse response = new CorporateAccountResponse();
         response.setId(account.getId());
         response.setIban(account.getIban());
-        response.setType(account.getType());
-        response.setStatus(account.getStatus());
+        response.setType(String.valueOf(account.getType()));
+        response.setStatus(String.valueOf(account.getStatus()));
         response.setBalance(account.getBalance());
         response.setOverdraftLimit(account.getOverdraftLimit());
-        response.setCurrency(account.getCurrency());
+        response.setCurrency(String.valueOf(account.getCurrency()));
         response.setCustomerId(account.getCustomerId());
         response.setCreatedAt(account.getCreatedAt());
         response.setUpdatedAt(account.getUpdatedAt());

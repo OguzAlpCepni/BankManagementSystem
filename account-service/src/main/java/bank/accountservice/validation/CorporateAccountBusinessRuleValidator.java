@@ -1,9 +1,10 @@
 package bank.accountservice.validation;
 
-import bank.accountservice.dto.request.CreateCorporateAccountRequest;
+
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.entity.CorporateAccount;
 import bank.accountservice.repository.CorporateAccountRepository;
+import io.github.oguzalpcepni.dto.accountdto.CreateCorporateAccountRequest;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

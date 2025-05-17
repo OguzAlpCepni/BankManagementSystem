@@ -33,5 +33,16 @@ public interface AccountService {
      * @param transactionId İşlem ID
      * @return İşlem başarılı ise true, değilse false
      */
-    boolean creditAccount(UUID id, BigDecimal amount, String description, UUID transactionId);
+    boolean creditAccount(String iban, BigDecimal amount, String description, UUID transactionId);
+    
+    /**
+     * Saga pattern telafi işlemi - Başarısız bir işlem sonrasında kaynak hesaba
+     * çekilen parayı geri yatırma işlemi
+     * @param iban Hesap IBAN
+     * @param amount Yatırılacak miktar
+     * @param description İşlem açıklaması
+     * @param transactionId İşlem ID
+     * @return İşlem başarılı ise true, değilse false
+     */
+    boolean compensateDebit(String iban, BigDecimal amount, String description, UUID transactionId);
 } 

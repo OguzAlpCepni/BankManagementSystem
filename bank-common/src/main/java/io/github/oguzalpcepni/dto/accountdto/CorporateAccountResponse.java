@@ -1,8 +1,6 @@
 package io.github.oguzalpcepni.dto.accountdto;
 
-import io.github.oguzalpcepni.dto.enums.AccountStatus;
-import io.github.oguzalpcepni.dto.enums.AccountType;
-import io.github.oguzalpcepni.dto.enums.CurrencyType;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,11 +17,11 @@ import java.util.UUID;
 public class CorporateAccountResponse {
     private UUID id;
     private String iban;
-    private AccountType type;
-    private AccountStatus status;
+    private String type;
+    private String status;
     private BigDecimal balance;
     private BigDecimal overdraftLimit;
-    private CurrencyType currency;
+    private String currency;
     private UUID customerId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -1,10 +1,11 @@
 package bank.accountservice.controller;
 
-import bank.accountservice.dto.CorporateAccountDto;
-import bank.accountservice.dto.request.CreateCorporateAccountRequest;
-import bank.accountservice.dto.response.CorporateAccountResponse;
-import bank.accountservice.dto.response.TransactionResponse;
+
 import bank.accountservice.service.CorporateAccountService;
+import io.github.oguzalpcepni.dto.accountdto.CorporateAccountDto;
+import io.github.oguzalpcepni.dto.accountdto.CorporateAccountResponse;
+import io.github.oguzalpcepni.dto.accountdto.CreateCorporateAccountRequest;
+import io.github.oguzalpcepni.dto.accountdto.TransactionResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

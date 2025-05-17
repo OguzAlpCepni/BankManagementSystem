@@ -1,6 +1,5 @@
-package bank.transferservice.dto;
+package io.github.oguzalpcepni.dto.transferdto;
 
-import bank.transferservice.entity.TransferType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -39,7 +38,7 @@ public class TransferRequest {
     private String currency;
     
     @NotNull(message = "Transfer type is required")
-    private TransferType transferType;
+    private String transferType;
     
     private String description;
     

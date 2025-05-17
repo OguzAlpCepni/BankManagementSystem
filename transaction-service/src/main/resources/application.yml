@@ -2,7 +2,7 @@ spring:
   application:
     name: "transaction-service"
   datasource:
-    url: "jdbc:postgresql://localhost:5411/account"
+    url: "jdbc:postgresql://localhost:5451/transaction"
     username: postgres
     password: postgres
   jpa:
@@ -12,6 +12,25 @@ spring:
     showSql: true
     hibernate:
       ddlAuto: update
+  cloud:
+    function:
+      definition: handleTransferDebitedEvent
+    stream:
+      defaultBinder: kafka
+      bindings:
+        # Transfer events
+        handleTransferDebitedEvent-in-0:
+          destination: transfer-money
+          content-type: application/json
+          group: transaction-service-group
+
+        transactionCompleted-out-0:
+          destination: transaction-completed-topic
+          content-type: application/json
+          
+      kafka:
+        binder:
+          brokers: localhost:9092
 
 server:
   port: 8040

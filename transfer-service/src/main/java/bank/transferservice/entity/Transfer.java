@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.GenericGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -18,16 +19,21 @@ import java.util.UUID;
 @AllArgsConstructor
 public class Transfer extends BaseEntity {
 
-    @Column(nullable = false)
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
+    private UUID id;
+
+    @Column(name = "source_account_id", nullable = false)
     private UUID sourceAccountId;
 
-    @Column(nullable = false)
-    private String sourceIban;
-
-    @Column(nullable = false)
+    @Column(name = "target_account_id", nullable = false)
     private UUID targetAccountId;
 
-    @Column(nullable = false)
+    @Column(name = "source_iban", nullable = false)
+    private String sourceIban;
+
+    @Column(name = "target_iban", nullable = false)
     private String targetIban;
 
     @Column(nullable = false)
@@ -36,7 +42,7 @@ public class Transfer extends BaseEntity {
     @Column(nullable = false)
     private String currency;
 
-    @Column(length = 255)
+    @Column
     private String description;
 
     @Enumerated(EnumType.STRING)
@@ -47,19 +53,23 @@ public class Transfer extends BaseEntity {
     @Column(nullable = false)
     private TransferStatus status;
 
-    @Column
-    private LocalDateTime completedAt;
-
-    @Column
-    private String errorMessage;
-
-    @Column(nullable = false)
+    @Column(name = "transaction_reference", unique = true)
     private String transactionReference;
 
-    // Saga pattern için işlem adımlarını takip etmek için
-    @Column
-    private Boolean sourceAccountDebited;
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
 
-    @Column
-    private Boolean targetAccountCredited;
-} 
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "error_message")
+    private String errorMessage;
+
+    @Column(name = "source_account_debited")
+    private boolean sourceAccountDebited;
+
+    @Column(name = "target_account_credited")
+    private boolean targetAccountCredited;
+
+
+}

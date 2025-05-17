@@ -1,15 +1,16 @@
 package bank.accountservice.validation;
 
-import bank.accountservice.dto.request.CreateIndividualAccountRequest;
+
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.entity.IndividualAccount;
 import bank.accountservice.repository.IndividualAccountRepository;
+import io.github.oguzalpcepni.dto.accountdto.CreateIndividualAccountRequest;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+
 
 /**
  * Hesap işlemlerine ait iş kurallarını doğrulayan sınıf.

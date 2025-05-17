@@ -1,6 +1,7 @@
 package bank.accountservice.controller;
 
 import bank.accountservice.service.AccountService;
+import io.github.oguzalpcepni.dto.accountdto.CreditRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -43,7 +44,7 @@ public class AccountController {
             @RequestParam BigDecimal amount) {
         return ResponseEntity.ok(accountService.hasEnoughBalance(id, amount));
     }
-    
+
     @PostMapping("/{id}/debit")
     public ResponseEntity<Boolean> debitAccount(// para çek
             @PathVariable UUID id,
@@ -52,13 +53,19 @@ public class AccountController {
             @RequestParam UUID transactionId) {
         return ResponseEntity.ok(accountService.debitAccount(id, amount, description, transactionId));
     }
-    
-    @PostMapping("/{id}/credit")
-    public ResponseEntity<Boolean> creditAccount(//Hesaba para yatırm
-            @PathVariable UUID id,
-            @RequestParam BigDecimal amount,
-            @RequestParam String description,
-            @RequestParam UUID transactionId) {
-        return ResponseEntity.ok(accountService.creditAccount(id, amount, description, transactionId));
+
+    @PostMapping("/{iban}/credit")
+    public ResponseEntity<Boolean> creditAccount(
+            @PathVariable String iban,
+            @RequestBody CreditRequest request) {
+        return ResponseEntity.ok(accountService.creditAccount(iban, request.amount(), request.description(), request.transactionId()));
     }
-} 
+
+    @PostMapping("/{iban}/compensate")
+    public ResponseEntity<Boolean> compensateDebit(
+            @PathVariable String iban,
+            @RequestBody CreditRequest request) {
+        return ResponseEntity.ok(accountService.compensateDebit(iban, request.amount(), request.description(), request.transactionId()));
+    }
+
+}

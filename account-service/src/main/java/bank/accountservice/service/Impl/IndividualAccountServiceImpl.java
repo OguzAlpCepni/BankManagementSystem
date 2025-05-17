@@ -1,14 +1,16 @@
 package bank.accountservice.service.Impl;
 
-import bank.accountservice.dto.IndividualAccountDto;
-import bank.accountservice.dto.request.CreateIndividualAccountRequest;
-import bank.accountservice.dto.response.IndividualAccountResponse;
-import bank.accountservice.dto.response.TransactionResponse;
 import bank.accountservice.entity.AccountStatus;
+import bank.accountservice.entity.AccountType;
+import bank.accountservice.entity.CurrencyType;
 import bank.accountservice.entity.IndividualAccount;
 import bank.accountservice.repository.IndividualAccountRepository;
 import bank.accountservice.service.IndividualAccountService;
 import bank.accountservice.validation.AccountBusinessRuleValidator;
+import io.github.oguzalpcepni.dto.accountdto.CreateIndividualAccountRequest;
+import io.github.oguzalpcepni.dto.accountdto.IndividualAccountDto;
+import io.github.oguzalpcepni.dto.accountdto.IndividualAccountResponse;
+import io.github.oguzalpcepni.dto.accountdto.TransactionResponse;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +48,11 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
 
         // İstek nesnesinden gelen bilgileri hesaba aktar
         account.setIban(ibanGenerator());
-        account.setType(request.getType());
+        account.setType(AccountType.valueOf(request.getType()));
         account.setStatus(AccountStatus.ACTIVE); // Yeni hesaplar varsayılan olarak aktiftir
         account.setBalance(request.getInitialBalance());
         account.setOverdraftLimit(request.getOverdraftLimit());
-        account.setCurrency(request.getCurrency());
+        account.setCurrency(CurrencyType.valueOf(request.getCurrency()));
         account.setCustomerId(request.getCustomerId());
         account.setIdentityNumber(request.getIdentityNumber());
         account.setFirstName(request.getFirstName());
@@ -342,11 +344,11 @@ public class IndividualAccountServiceImpl implements IndividualAccountService {
         IndividualAccountResponse response = new IndividualAccountResponse();
         response.setId(account.getId());
         response.setIban(account.getIban());
-        response.setType(account.getType());
-        response.setStatus(account.getStatus());
+        response.setType(String.valueOf(account.getType()));
+        response.setStatus(String.valueOf(account.getStatus()));
         response.setBalance(account.getBalance());
         response.setOverdraftLimit(account.getOverdraftLimit());
-        response.setCurrency(account.getCurrency());
+        response.setCurrency(String.valueOf(account.getCurrency()));
         response.setCustomerId(account.getCustomerId());
         response.setCreatedAt(account.getCreatedAt());
         response.setUpdatedAt(account.getUpdatedAt());

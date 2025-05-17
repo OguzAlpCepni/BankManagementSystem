@@ -1,7 +1,7 @@
 package bank.transferservice.controller;
 
-import bank.transferservice.dto.TransferRequest;
-import bank.transferservice.dto.TransferResponse;
+import io.github.oguzalpcepni.dto.transferdto.TransferRequest;
+import io.github.oguzalpcepni.dto.transferdto.TransferResponse;
 import bank.transferservice.entity.TransferStatus;
 import bank.transferservice.service.TransferService;
 import lombok.RequiredArgsConstructor;

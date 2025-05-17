@@ -14,20 +14,21 @@ spring:
       ddlAuto: update
   cloud:
     function:
-      definition: transferResponseConsumer
+      definition: transferResponseConsumer;transactionEventConsumer
     stream:
       defaultBinder: kafka
       bindings:
         transfer-out-0: #bu binding mesajları transfer-money topic gönderir
           destination: transfer-money
           content-type: application/json
-          group: transfer-money-group
-        transferResponseConsumer-in-0: # Fonksiyon ismi + "-in-0" formatı
-          destination: transfer-response # Dinlenecek topic adı
+
+        transactionEventConsumer-in-0:
+          destination: transaction-completed-topic
           content-type: application/json
-          group: transfer-response-group
-
-
+          group: transfer-service-group
+      kafka:
+        binder:
+          brokers: localhost:9092
 
 eureka:
   client:
@@ -38,3 +39,5 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${server.port}
+server:
+  port: 8021

@@ -4,7 +4,7 @@ import bank.accountservice.entity.Account;
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.repository.AccountRepository;
 import bank.accountservice.service.AccountService;
-import jakarta.persistence.EntityNotFoundException;
+import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -35,17 +35,17 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public void validateAccount(UUID id) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         if (account.getStatus() != AccountStatus.ACTIVE) {
-            throw new IllegalStateException("Account is not active, current status: " + account.getStatus());
+            throw new BusinessException("Account is not active, current status: " + account.getStatus());
         }
     }
     
     @Override
     public void validateAccount(String iban) {
         Account account = accountRepository.findByIban(iban)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with IBAN: " + iban));
+                .orElseThrow(() -> new BusinessException("Account not found with IBAN: " + iban));
         
         if (account.getStatus() != AccountStatus.ACTIVE) {
             throw new IllegalStateException("Account is not active, current status: " + account.getStatus());
@@ -55,7 +55,7 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public boolean hasEnoughBalance(UUID id, BigDecimal amount) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
         
         BigDecimal overdraftLimit = account.getOverdraftLimit() != null ? account.getOverdraftLimit() : BigDecimal.ZERO;
         BigDecimal availableBalance = account.getBalance().add(overdraftLimit);
@@ -71,7 +71,7 @@ public class AccountServiceImpl implements AccountService {
         
         try {
             Account account = accountRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+                    .orElseThrow(() -> new BusinessException("Account not found with id: " + id));
                     
             // Hesabın aktif olup olmadığını kontrol et
             if (account.getStatus() != AccountStatus.ACTIVE) {
@@ -111,17 +111,17 @@ public class AccountServiceImpl implements AccountService {
     
     @Override
     @Transactional
-    public boolean creditAccount(UUID id, BigDecimal amount, String description, UUID transactionId) {
-        log.info("Credit operation - Account ID: {}, Amount: {}, Description: {}, Transaction ID: {}", 
-                id, amount, description, transactionId);
+    public boolean creditAccount(String iban, BigDecimal amount, String description, UUID transactionId) {
+        log.info("Credit operation - Account ID: {}, Amount: {}, Description: {}, Transaction ID: {}",
+                iban, amount, description, transactionId);
         
         try {
-            Account account = accountRepository.findById(id)
-                    .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + id));
+            Account account = accountRepository.findByIban(iban)
+                    .orElseThrow(() -> new BusinessException("Account not found with id: " + iban));
                     
             // Hesabın aktif olup olmadığını kontrol et
             if (account.getStatus() != AccountStatus.ACTIVE) {
-                log.error("Cannot credit to inactive account: {}, status: {}", id, account.getStatus());
+                log.error("Cannot credit to inactive account: {}, status: {}", iban, account.getStatus());
                 return false;
             }
             
@@ -136,11 +136,43 @@ public class AccountServiceImpl implements AccountService {
             // saveTransactionRecord(account, amount, description, transactionId, "CREDIT");
             
             log.info("Successfully credited {} to account {}, new balance: {}", 
-                    amount, id, newBalance);
+                    amount, iban, newBalance);
             return true;
             
         } catch (Exception e) {
-            log.error("Error during credit operation for account: {}", id, e);
+            log.error("Error during credit operation for account: {}", iban, e);
+            return false;
+        }
+    }
+    
+    @Override
+    @Transactional
+    public boolean compensateDebit(String iban, BigDecimal amount, String description, UUID transactionId) {
+        log.info("Compensate debit operation - Account IBAN: {}, Amount: {}, Description: {}, Transaction ID: {}",
+                iban, amount, description, transactionId);
+        
+        try {
+            Account account = accountRepository.findByIban(iban)
+                    .orElseThrow(() -> new BusinessException("Account not found with IBAN: " + iban));
+                    
+            // Hesaba telafi amaçlı para yatırma işlemi
+            BigDecimal newBalance = account.getBalance().add(amount);
+            account.setBalance(newBalance);
+            account.setUpdatedAt(LocalDateTime.now());
+            
+            accountRepository.save(account);
+            
+            // Burada hareket kaydı oluşturulabilir (Transaction entity)
+            // saveTransactionRecord(account, amount, description, transactionId, "COMPENSATION");
+            
+            log.info("Successfully compensated {} to account {}, new balance: {}", 
+                    amount, iban, newBalance);
+            return true;
+            
+        } catch (Exception e) {
+            log.error("Error during compensation operation for account: {}", iban, e);
+            log.error("CRITICAL: Manual intervention required to credit {} to account {}", amount, iban);
+            // Bu noktada bir notification service veya alert mekanizması ile yöneticilere bildirim gönderilebilir
             return false;
         }
     }
