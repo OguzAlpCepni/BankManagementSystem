@@ -1,6 +1,7 @@
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\AccountResponse.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\AccountSearchRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\UpdateAccountStatusRequest.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\security\filter\BaseJwtAuthFilter.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\userdto\UserRegisterRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\CorporateAccountDto.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\transferdto\TransferResponse.java
@@ -9,9 +10,11 @@ C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\IndividualAccountDto.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\exceptions\result\ExceptionResult.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\IndividualAccountResponse.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\userdto\UserLoginRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\TransactionEvent.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\TransferEvent.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\event\AccountEvent.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\annotations\EnableCore.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\TransactionRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\CreateCorporateAccountRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\TransactionResponse.java
@@ -22,6 +25,8 @@ C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\security\jwt\BaseJwtService.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\CreditRequest.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\accountdto\AccountDto.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\security\configuration\BaseSecurityConfiguration.java
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\security\configuration\BaseSecurityService.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\userdto\UserRegisterResponse.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\exceptions\result\ValidationExceptionResult.java
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java\io\github\oguzalpcepni\dto\transferdto\TransferRequest.java

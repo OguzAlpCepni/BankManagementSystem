@@ -1,4 +1,5 @@
 io.github.oguzalpcepni
+io.github.oguzalpcepni.annotations
 io.github.oguzalpcepni.dto.accountdto
 io.github.oguzalpcepni.dto.transferdto
 io.github.oguzalpcepni.dto.userdto
@@ -6,4 +7,6 @@ io.github.oguzalpcepni.event
 io.github.oguzalpcepni.exceptions
 io.github.oguzalpcepni.exceptions.result
 io.github.oguzalpcepni.exceptions.type
+io.github.oguzalpcepni.security.configuration
+io.github.oguzalpcepni.security.filter
 io.github.oguzalpcepni.security.jwt

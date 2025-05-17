@@ -1,4 +1,6 @@
 io\github\oguzalpcepni\dto\accountdto\IndividualAccountResponse.class
+io\github\oguzalpcepni\annotations\EnableCore.class
+io\github\oguzalpcepni\security\configuration\BaseSecurityService.class
 io\github\oguzalpcepni\dto\accountdto\AccountResponse.class
 io\github\oguzalpcepni\dto\accountdto\AccountDto.class
 io\github\oguzalpcepni\dto\accountdto\UpdateAccountStatusRequest.class
@@ -18,6 +20,8 @@ io\github\oguzalpcepni\dto\accountdto\TransactionResponse.class
 io\github\oguzalpcepni\exceptions\type\BusinessException.class
 io\github\oguzalpcepni\dto\accountdto\TransactionRequest.class
 io\github\oguzalpcepni\event\AccountEvent$AccountEventBuilder.class
+io\github\oguzalpcepni\security\filter\BaseJwtAuthFilter.class
+io\github\oguzalpcepni\dto\userdto\UserLoginRequest.class
 io\github\oguzalpcepni\security\jwt\BaseJwtService.class
 io\github\oguzalpcepni\dto\transferdto\TransferResponse.class
 io\github\oguzalpcepni\dto\accountdto\CreditRequest.class
@@ -29,3 +33,4 @@ io\github\oguzalpcepni\exceptions\GlobalExceptionHandler.class
 io\github\oguzalpcepni\dto\accountdto\AccountSearchRequest.class
 io\github\oguzalpcepni\Main.class
 io\github\oguzalpcepni\event\AccountEvent.class
+io\github\oguzalpcepni\security\configuration\BaseSecurityConfiguration.class

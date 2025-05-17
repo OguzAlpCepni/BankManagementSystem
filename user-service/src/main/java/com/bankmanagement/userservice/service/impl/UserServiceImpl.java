@@ -3,13 +3,18 @@ package com.bankmanagement.userservice.service.impl;
 import com.bankmanagement.userservice.entity.Users;
 import com.bankmanagement.userservice.repository.UsersRepository;
 import com.bankmanagement.userservice.service.UserService;
+import io.github.oguzalpcepni.dto.userdto.UserLoginRequest;
 import io.github.oguzalpcepni.dto.userdto.UserRegisterRequest;
 import io.github.oguzalpcepni.dto.userdto.UserRegisterResponse;
+import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,19 @@ public class UserServiceImpl implements UserService {
 
         return new UserRegisterResponse(user.getUsername(),user.getEmail());
 
+    }
+
+    @Override
+    public String login(UserLoginRequest userLoginRequest) {
+        Users user = usersRepository.findByUsername(userLoginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username " + userLoginRequest.getUsername() + " not found"));
+        boolean isPasswordCorrect = passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword());
+        if(isPasswordCorrect) {
+            throw new BusinessException("Invalid or wrong credentials");
+        }
+        Map<String,Object> roles = new HashMap<>();
+        roles.put("roles", user.getOperationClaims().stream().map(c->c.getName()).toList());
+
+        return "";
     }
 
     @Override
