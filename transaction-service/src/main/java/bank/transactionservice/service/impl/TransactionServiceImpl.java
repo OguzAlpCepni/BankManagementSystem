@@ -143,11 +143,14 @@ public class TransactionServiceImpl implements TransactionService {
             );
             
             if (compensationResponse.getBody() != null && compensationResponse.getBody()) {
+                // sadce log atan bir yapı kurulmaması lazım
                 log.info("Compensation successful, funds returned to source account: {}", transaction.getSourceIban());
             } else {
+                // sadce log atan bir yapı kurulmaması lazım
                 log.error("Compensation failed, manual intervention required for source account: {}", transaction.getSourceIban());
             }
         } catch (Exception e) {
+            // sadce log atan bir yapı kurulmaması lazım
             log.error("Error during compensation operation: {}", e.getMessage(), e);
             log.error("Manual intervention required to refund source account: {}", transaction.getSourceIban());
         }
