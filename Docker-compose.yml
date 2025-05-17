@@ -47,6 +47,23 @@ services:
     volumes:
       - postgres5451_data:/var/lib/postgresql/data
 
+  # user service db
+  postgres5461:
+    image: postgres:latest
+    container_name: postgres5461
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: users
+    ports:
+      - "5461:5432"
+    networks:
+      - app-network
+    volumes:
+      - postgres5461_data:/var/lib/postgresql/data
+
+
   kafka:
     image: bitnami/kafka
     ports:
@@ -77,3 +94,4 @@ volumes:
   postgres5411_data:
   postgres5421_data:
   postgres5451_data:
+  postgres5461_data:
