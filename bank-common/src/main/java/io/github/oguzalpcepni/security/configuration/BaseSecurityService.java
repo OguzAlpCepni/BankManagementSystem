@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BaseSecurityService {
-    private BaseJwtAuthFilter baseJwtAuthFilter;
+    private final BaseJwtAuthFilter baseJwtAuthFilter;
     private static final String[] WHITE_LIST_URLS = {
             "/swagger-ui/**",
             "/v2/api-docs",
@@ -29,5 +29,5 @@ public class BaseSecurityService {
     }
 // feign clientlerin securit ypılandırlılması araştır
     //identity service login işlemii diğer tüm servislerin jwt işlemlerine bakman lazım
-    // bütün servislerdeki paket şeyini güncelle
+
 }

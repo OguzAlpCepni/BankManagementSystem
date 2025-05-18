@@ -7,6 +7,7 @@ import io.github.oguzalpcepni.dto.userdto.UserLoginRequest;
 import io.github.oguzalpcepni.dto.userdto.UserRegisterRequest;
 import io.github.oguzalpcepni.dto.userdto.UserRegisterResponse;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
+import io.github.oguzalpcepni.security.jwt.BaseJwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -21,6 +22,8 @@ import java.util.Map;
 public class UserServiceImpl implements UserService {
     private final UsersRepository usersRepository;
     private final PasswordEncoder passwordEncoder;
+    private final BaseJwtService baseJwtService;
+    
     @Override
     public UserRegisterResponse createUser(UserRegisterRequest userRegisterRequest) {
         if(usersRepository.findByUsername(userRegisterRequest.getUsername()).isPresent()) {
@@ -44,13 +47,15 @@ public class UserServiceImpl implements UserService {
     public String login(UserLoginRequest userLoginRequest) {
         Users user = usersRepository.findByUsername(userLoginRequest.getUsername()).orElseThrow(() -> new UsernameNotFoundException("Username " + userLoginRequest.getUsername() + " not found"));
         boolean isPasswordCorrect = passwordEncoder.matches(userLoginRequest.getPassword(), user.getPassword());
-        if(isPasswordCorrect) {
+        if(!isPasswordCorrect) {
             throw new BusinessException("Invalid or wrong credentials");
         }
         Map<String,Object> roles = new HashMap<>();
-        roles.put("roles", user.getOperationClaims().stream().map(c->c.getName()).toList());
-
-        return "";
+        if (user.getOperationClaims() != null) {
+            roles.put("roles", user.getOperationClaims().stream().map(c->c.getName()).toList());
+        }
+        
+        return baseJwtService.generateToken(user.getUsername());
     }
 
     @Override
