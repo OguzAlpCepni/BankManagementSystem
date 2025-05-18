@@ -10,6 +10,7 @@ import javax.crypto.SecretKey;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class BaseJwtService {
@@ -17,13 +18,33 @@ public class BaseJwtService {
     private long EXPIRATION_TIME = 600000;
     private String SECRET_KEY = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
 
-    public String generateToken(String username ) {
+    public String generateToken(String username) {
         return Jwts.builder()
                 .setSubject(username)
+                .claim("roles", List.of("CUSTOMER")) // Default role for simple authentication
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(getSignKey())
                 .compact();
     }
+
+    public String generateToken(String username, List<String> roles) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("roles", roles)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSignKey())
+                .compact();
+    }
+
+    public String generateToken(String username, Map<String, Object> claims) {
+        return Jwts.builder()
+                .setSubject(username)
+                .addClaims(claims)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSignKey())
+                .compact();
+    }
+    
     public Boolean verifyToken(String token) {
         return Jwts.parser()
                 .verifyWith((SecretKey) getSignKey())
@@ -33,6 +54,7 @@ public class BaseJwtService {
                 .getExpiration()
                 .after(new Date(System.currentTimeMillis()));
     }
+    
     public String extractUsername(String token) {
         return  Jwts.parser()
                 .verifyWith((SecretKey) getSignKey())
@@ -41,6 +63,7 @@ public class BaseJwtService {
                 .getPayload()
                 .getSubject();
     }
+    
     public List<String> extractRoles(String token) {
         return Jwts
                 .parser()
@@ -49,9 +72,8 @@ public class BaseJwtService {
                 .parseSignedClaims(token)
                 .getPayload()
                 .get("roles", List.class);
-
-
     }
+    
     public Key getSignKey(){
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
