@@ -26,5 +26,10 @@ public class AuthController {
         UserRegisterResponse response = userService.createUser(registerRequest);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<UserRegisterResponse> registerAdmin(@RequestBody UserRegisterRequest registerRequest) {
+        UserRegisterResponse response = userService.CreateAdminUser(registerRequest);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
 }
 

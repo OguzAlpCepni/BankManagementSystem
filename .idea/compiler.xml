@@ -22,6 +22,15 @@
         <module name="account-service" />
         <module name="transfer-service" />
       </profile>
+      <profile name="Annotation profile for customer-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath>
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="customer-service" />
+      </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="accountservice" target="21" />
@@ -32,6 +41,7 @@
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="account-service" options="-parameters" />
       <module name="accountservice" options="-parameters" />
+      <module name="customer-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="transaction-service" options="-parameters" />
       <module name="transfer-service" options="-parameters" />

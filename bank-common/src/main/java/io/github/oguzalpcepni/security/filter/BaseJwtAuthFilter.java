@@ -31,6 +31,7 @@ public class BaseJwtAuthFilter extends OncePerRequestFilter {
 
         if (jwtHeader != null && jwtHeader.startsWith("Bearer ")) {
             String jwt = jwtHeader.substring(7);
+            String userId = baseJwtService.extractUserId(jwt);
             String username = baseJwtService.extractUsername(jwt);
             System.out.println("username: " + username);
             List<String> roles = baseJwtService.extractRoles(jwt);
@@ -41,7 +42,7 @@ public class BaseJwtAuthFilter extends OncePerRequestFilter {
             List<SimpleGrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).toList();
             if (baseJwtService.verifyToken(jwt)){
                 UsernamePasswordAuthenticationToken token = new
-                        UsernamePasswordAuthenticationToken(username, null, authorities);
+                        UsernamePasswordAuthenticationToken(userId, null, authorities);
                 token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(token);

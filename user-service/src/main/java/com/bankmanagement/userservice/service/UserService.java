@@ -10,4 +10,6 @@ public interface UserService extends UserDetailsService {
 
     UserRegisterResponse createUser(UserRegisterRequest userRegisterRequest);
     String login(UserLoginRequest userLoginRequest);
+    UserRegisterResponse CreateAdminUser(UserRegisterRequest userRegisterRequest);
+
 }

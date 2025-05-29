@@ -79,7 +79,33 @@ public class UserServiceImpl implements UserService {
         }
         
         // Generate token with roles
-        return baseJwtService.generateToken(user.getUsername(), roles);
+        return baseJwtService.generateToken(String.valueOf(user.getId()),user.getUsername(), roles);
+    }
+
+    @Override
+    public UserRegisterResponse CreateAdminUser(UserRegisterRequest userRegisterRequest) {
+        if(usersRepository.findByUsername(userRegisterRequest.getUsername()).isPresent()) {
+            throw new UsernameNotFoundException("Username " + userRegisterRequest.getUsername() + " already exists");
+        }
+        if (usersRepository.findByEmail(userRegisterRequest.getEmail()).isPresent()){
+            throw new RuntimeException("Email " + userRegisterRequest.getEmail() + " already exists");
+        }
+
+        // Get CUSTOMER role
+        OperationClaim customerRole = operationClaimRepository.findByName("ADMIN")
+                .orElseThrow(() -> new BusinessException("ADMIN role not found"));
+
+        Users user = new Users();
+        user.setUsername(userRegisterRequest.getUsername());
+        user.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
+        user.setEmail(userRegisterRequest.getEmail());
+
+        // Assign ADMIN role to the user
+        user.setOperationClaims(new HashSet<>(Collections.singletonList(customerRole)));
+
+        usersRepository.save(user);
+
+        return new UserRegisterResponse(user.getUsername(), user.getEmail());
     }
 
     @Override

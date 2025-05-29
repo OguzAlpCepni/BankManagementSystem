@@ -41,12 +41,12 @@ public class SecurityConfiguration {
                 // Bireysel hesap işlemleri
                 .requestMatchers("/api/v1/individual-accounts/*/withdraw", 
                                 "/api/v1/individual-accounts/*/deposit")
-                .hasAuthority("CUSTOMER")
+                .hasAnyAuthority("CUSTOMER","ADMIN")
                 
                 // Kurumsal hesap işlemleri
                 .requestMatchers("/api/v1/corporate-accounts/*/withdraw", 
                                 "/api/v1/corporate-accounts/*/deposit")
-                .hasAnyAuthority("CUSTOMER", "EMPLOYEE")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE","ADMIN")
                 
                 // Hesap listeleme işlemleri - yönetici ve çalışanlar
                 .requestMatchers("/api/v1/individual-accounts",
