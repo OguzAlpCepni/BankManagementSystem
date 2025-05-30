@@ -23,19 +23,25 @@ public class Installment {
     @UuidGenerator
     private UUID id;
 
-    @ManyToOne
-    @JoinColumn(name = "loan_application_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "loan_application_id", nullable = false)
     private LoanApplication loanApplication;
 
-    private int installmentNumber;
+    @Column(nullable = false)
+    private Integer installmentNumber;
 
+    @Column(nullable = false)
     private LocalDateTime dueDate;
 
+    @Column(nullable = false)
     private BigDecimal principalAmount;
 
+    @Column(nullable = false)
     private BigDecimal interestAmount;
 
+    @Column(nullable = false)
     private BigDecimal totalAmount;
 
-    private boolean paid;
+    @Column(nullable = false)
+    private Boolean paid = false;
 }

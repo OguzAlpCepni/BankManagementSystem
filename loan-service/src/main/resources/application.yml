@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: loan-service
+  datasource:
+    url: "jdbc:postgresql://localhost:5491/loan"
+    username: postgres
+    password: postgres
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    showSql: true
+    hibernate:
+      ddlAuto: update
+  cloud:
+    function:
+      definition: LoanEventConsumer
+    stream:
+      defaultBinder: kafka
+      bindings:
+
+        loan-out-0: #bu binding mesajlar? transfer-money topic gönderir
+          destination: start-loan
+          content-type: application/json
+
+        LoanEventConsumer-in-0:
+          destination: loan-completed-topic
+          content-type: application/json
+          group: loan-service-group
+      kafka:
+        binder:
+          brokers: localhost:9092
+
+server:
+  port: 8091
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: "http://localhost:8888/eureka/"
+    register-with-eureka: true
+    fetch-registry: true
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}

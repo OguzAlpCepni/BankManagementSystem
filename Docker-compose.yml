@@ -71,6 +71,22 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
 
+  # user service db
+  postgres5491:
+    image: postgres:latest
+    container_name: postgres5491
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: loan
+    ports:
+      - "5491:5432"
+    networks:
+      - app-network
+    volumes:
+      - postgres5491_data:/var/lib/postgresql/data
+
   kafka:
     image: bitnami/kafka
     ports:
@@ -102,3 +118,4 @@ volumes:
   postgres5421_data:
   postgres5451_data:
   postgres5461_data:
+  postgres5491_data:

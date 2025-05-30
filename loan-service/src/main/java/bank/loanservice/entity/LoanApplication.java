@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
@@ -19,37 +21,39 @@ import java.util.UUID;
 @Getter
 @Setter
 public class LoanApplication {
-
+    // ------ Primary Key ------
     @Id
     @UuidGenerator
     private UUID id;
-
-    private UUID loanId;
-
+    // ------ External Reference for UI / API ------
+    @Column(name = "external_loan_id", nullable = false, unique = true, updatable = false)
+    private UUID externalLoanId = UUID.randomUUID();//Genellikle dış dünyaya gösterilen "iş tanımlayıcı" gibi kullanılır.
+    // ------ Business Fields ------
+    @Column(nullable = false, updatable = false)
     private UUID customerId;
+    @Column(nullable = false)
     private BigDecimal amount;
+    @Column(nullable = false)
     private int installmentCount;
+    @Column(length = 255)
     private String purpose;
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private LoanStatus status;
+    @Column(nullable = false)
     private BigDecimal interestRate;
 
+    //audit
+    @CreationTimestamp
+    @Column(updatable = false)
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
-
-    @OneToMany(mappedBy = "loanApplication", cascade = CascadeType.ALL)
+    // Relations
+    @OneToMany(mappedBy = "loanApplication", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Installment> installments;
 
-    @PrePersist
-    protected void onCreate() {
-        loanId = UUID.randomUUID();
-        createdAt = LocalDateTime.now();
-        status = LoanStatus.PENDING;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+    @OneToOne(mappedBy = "loanApplication", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Underwriting underwriting;
 }
