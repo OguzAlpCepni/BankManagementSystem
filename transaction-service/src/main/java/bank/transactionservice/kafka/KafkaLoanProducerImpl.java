@@ -41,7 +41,7 @@ public class KafkaLoanProducerImpl implements KafkaLoanProducerService{
         loanUnderwritingRejectedEvent.setLoanId(loanTransaction.getLoanId());
         loanUnderwritingRejectedEvent.setCreditScore(loanTransaction.getCreditScore());
         loanUnderwritingRejectedEvent.setFraudCheckPassed(loanTransaction.getFraudCheckPassed());
-        streamBridge.send("underwritingCompleted-out-0",loanUnderwritingRejectedEvent);
+        streamBridge.send("underwritingRejected-out-0",loanUnderwritingRejectedEvent);
         log.info("event send : {} ",loanUnderwritingRejectedEvent);
     }
 }

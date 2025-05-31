@@ -42,6 +42,14 @@ spring:
           content-type: application/json
           group: resultFraud-group
 
+        underwritingCompleted-out-0:
+          destination: underwritingComplete-fraud
+          content-type: application/json
+
+        underwritingRejected-out-0:
+          destination: underwritingRejected-fraud
+          content-type: application/json
+
       kafka:
         binder:
           brokers: localhost:9092
