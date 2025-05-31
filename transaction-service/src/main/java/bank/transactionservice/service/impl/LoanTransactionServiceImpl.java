@@ -3,11 +3,12 @@ package bank.transactionservice.service.impl;
 import bank.transactionservice.client.LoanClient;
 import bank.transactionservice.entity.LoanTransaction;
 import bank.transactionservice.entity.TransactionStatus;
-import bank.transactionservice.kafka.KafkaLoanProducerImpl;
 import bank.transactionservice.kafka.KafkaLoanProducerService;
 import bank.transactionservice.repository.LoanTransactionRepository;
 import bank.transactionservice.service.LoanTransactionService;
+import io.github.oguzalpcepni.event.FraudResultEvent;
 import io.github.oguzalpcepni.event.LoanApplicationCreatedEvent;
+import io.github.oguzalpcepni.event.LoanUnderwritingCompletedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class LoanTransactionServiceImpl implements LoanTransactionService {
     private final LoanTransactionRepository loanTransactionRepository;
     private final LoanClient loanClient;
     private final KafkaLoanProducerService kafkaLoanProducerService;
-    private final KafkaLoanProducerImpl kafkaLoanProducerImpl;
+
 
     @Override
     @Transactional
@@ -49,6 +50,23 @@ public class LoanTransactionServiceImpl implements LoanTransactionService {
         loanTransactionRepository.save(loanTransaction);
 
         // burada eventimiz fraud check işlemine gönderdik
-        kafkaLoanProducerImpl.sendFraudCheckEvent(loanTransaction);
+        kafkaLoanProducerService.sendFraudCheckEvent(loanTransaction);
+    }
+
+    @Override
+    public void onFraudResult(FraudResultEvent fraudResultEvent) {
+        LoanTransaction loanTransaction = loanTransactionRepository.findById(fraudResultEvent.getLoanId()).orElseThrow(() -> new RuntimeException("loan transaction not found"));
+
+        if(fraudResultEvent.isFraudCheckPassed()){
+            loanTransaction.setStatus(TransactionStatus.UNDERWRITING_COMPLETED);
+            loanTransactionRepository.save(loanTransaction);
+            kafkaLoanProducerService.sendFraudCompletedResultEvent(loanTransaction);
+
+        }
+        else {
+            loanTransaction.setStatus(TransactionStatus.FRAUD_CHECK_FAILED);
+            loanTransactionRepository.save(loanTransaction);
+            kafkaLoanProducerService.sendFraudRejectedResultEvent(loanTransaction);
+        }
     }
 }

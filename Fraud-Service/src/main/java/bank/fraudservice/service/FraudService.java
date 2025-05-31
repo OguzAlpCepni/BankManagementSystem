@@ -1,6 +1,8 @@
 package bank.fraudservice.service;
 
+import io.github.oguzalpcepni.event.FraudCheckEvent;
+
 public interface FraudService {
 
-    void handleFraudResult();
+    public void handleFraudCheck(FraudCheckEvent fraudCheckEvent);
 }

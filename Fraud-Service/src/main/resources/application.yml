@@ -2,7 +2,7 @@ spring:
   application:
     name: Fraud-Service
   datasource:
-    url: "jdbc:postgresql://localhost:5491/fraud"
+    url: "jdbc:postgresql://localhost:5495/fraud"
     username: postgres
     password: postgres
   jpa:
@@ -14,19 +14,19 @@ spring:
       ddlAuto: update
   cloud:
     function:
-      definition: LoanEventConsumer
+      definition: FraudCheckEventConsumer
     stream:
       defaultBinder: kafka
       bindings:
 
-        loan-out-0: #bu binding mesajlar? start-loan topic gönderir
-          destination: start-loan
+        resultFraud-out-0: #bu binding mesajlar? start-loan topic gönderir
+          destination: result-fraud
           content-type: application/json
 
-        LoanEventConsumer-in-0:
-          destination: loan-completed-topic
+        FraudCheckEventConsumer-in-0:
+          destination: check-fraud
           content-type: application/json
-          group: loan-service-group
+          group: fraud-service-group
       kafka:
         binder:
           brokers: localhost:9092

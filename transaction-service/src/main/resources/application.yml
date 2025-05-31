@@ -14,7 +14,7 @@ spring:
       ddlAuto: update
   cloud:
     function:
-      definition: handleTransferDebitedEvent
+      definition: handleTransferDebitedEvent; loanApplicationCreatedEventConsumer; resultFraudConsumer
     stream:
       defaultBinder: kafka
       bindings:
@@ -28,9 +28,19 @@ spring:
           destination: transaction-completed-topic
           content-type: application/json
 
+        loanApplicationCreatedEventConsumer-in-0:
+          destination: start-loan
+          content-type: application/json
+          group: startLoan-group
+
         checkFraud-out-0:
           destination: check-fraud
           content-type: application/json
+
+        resultFraudConsumer-in-0:
+          destination: result-fraud
+          content-type: application/json
+          group: resultFraud-group
 
       kafka:
         binder:

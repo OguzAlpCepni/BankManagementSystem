@@ -1,6 +1,7 @@
 package bank.transactionservice.kafka;
 
 import bank.transactionservice.service.LoanTransactionService;
+import io.github.oguzalpcepni.event.FraudResultEvent;
 import io.github.oguzalpcepni.event.LoanApplicationCreatedEvent;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ public class LoanApplicationConsumer {
 
 
     @Bean
-    public Consumer<LoanApplicationCreatedEvent> loanApplicationCreatedEventConsumer(TransferEventConsumer transferEventConsumer) {
+    public Consumer<LoanApplicationCreatedEvent> loanApplicationCreatedEventConsumer() {
         return loanApplicationCreatedEvent -> {
             log.info("loan created event come to transaction-service consumer: {}", loanApplicationCreatedEvent);
         try {
@@ -29,6 +30,19 @@ public class LoanApplicationConsumer {
         }
         };
 
+    }
+
+    @Bean
+    public Consumer<FraudResultEvent> resultFraudConsumer(){
+        return fraudResultEvent -> {
+            log.info("fraud result came to transaction-service consumer");
+            try {
+                loanTransactionService.onFraudResult(fraudResultEvent);
+                log.info("event goes to transaction-service method");
+            }catch (BusinessException businessException){
+                throw new BusinessException(businessException.getMessage());
+            }
+        };
     }
 
 }
