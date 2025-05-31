@@ -45,6 +45,30 @@ public class LoanServiceImpl implements LoanService {
         loanStatusResponse.setStatus(String.valueOf(LoanStatus.PENDING));
         return loanStatusResponse;
     }
+    /**
+     * Çok basit bir örnek: customerId'nin hash koduna göre 300-850 aralığında bir puan döner.
+     * Böylece aynı customerId için hep aynı skor elde edilmiş olur.
+     *
+     * NOT: Gerçek dünyada böyle kullanılmamalıdır; bu sadece POC/demo amaçlı bir stub'tur.
+     *
+     * @param customerId Kredi skorunu hesaplayacağımız müşteri UUID'si
+     * @return 300 ile 850 (dahil) arasında bir int kredi skoru
+     */
+    public int calculateCreditScore(UUID customerId) {
+        // UUID'nin hashCode() değeri pozitif veya negatif olabilir.
+        int raw = customerId.hashCode();
+
+        // Negatif olma ihtimaline karşı mutlak değerini alıyoruz.
+        int absHash = Math.abs(raw);
+
+        // 300 ile 850 arasında sonuç üretmek için:
+        // Puan aralığımızın genişliği = 850 - 300 + 1 = 551
+        // absHash % 551 ==> 0..550 arası bir değer
+        int scoreInRange = (absHash % 551) + 300;
+
+        return scoreInRange;
+    }
+
 
     private LoanApplicationCreatedEvent loanApplicationMapToEvent(LoanApplication loanApplication) {
         LoanApplicationCreatedEvent loanApplicationCreatedEvent = new LoanApplicationCreatedEvent();
@@ -54,4 +78,5 @@ public class LoanServiceImpl implements LoanService {
         loanApplicationCreatedEvent.setPurpose(loanApplication.getPurpose());
         return loanApplicationCreatedEvent;
     }
+
 }

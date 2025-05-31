@@ -71,7 +71,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
 
-  # user service db
+  # loan service db
   postgres5491:
     image: postgres:latest
     container_name: postgres5491
@@ -86,6 +86,22 @@ services:
       - app-network
     volumes:
       - postgres5491_data:/var/lib/postgresql/data
+
+  # fraud service db
+  postgres5495:
+    image: postgres:latest
+    container_name: postgres5495
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fraud
+    ports:
+      - "5495:5432"
+    networks:
+      - app-network
+    volumes:
+      - postgres5495_data:/var/lib/postgresql/data
 
   kafka:
     image: bitnami/kafka
@@ -119,3 +135,4 @@ volumes:
   postgres5451_data:
   postgres5461_data:
   postgres5491_data:
+  postgres5495_data:

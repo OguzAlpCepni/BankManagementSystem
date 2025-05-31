@@ -1,8 +1,8 @@
 spring:
   application:
-    name: "transaction-service"
+    name: Fraud-Service
   datasource:
-    url: "jdbc:postgresql://localhost:5451/transaction"
+    url: "jdbc:postgresql://localhost:5491/fraud"
     username: postgres
     password: postgres
   jpa:
@@ -14,30 +14,26 @@ spring:
       ddlAuto: update
   cloud:
     function:
-      definition: handleTransferDebitedEvent
+      definition: LoanEventConsumer
     stream:
       defaultBinder: kafka
       bindings:
-        # Transfer events
-        handleTransferDebitedEvent-in-0:
-          destination: transfer-money
-          content-type: application/json
-          group: transaction-service-group
 
-        transactionCompleted-out-0:
-          destination: transaction-completed-topic
+        loan-out-0: #bu binding mesajlar? start-loan topic gönderir
+          destination: start-loan
           content-type: application/json
 
-        checkFraud-out-0:
-          destination: check-fraud
+        LoanEventConsumer-in-0:
+          destination: loan-completed-topic
           content-type: application/json
-
+          group: loan-service-group
       kafka:
         binder:
           brokers: localhost:9092
 
 server:
-  port: 8040
+  port: 8095
+
 
 eureka:
   client:
