@@ -14,16 +14,15 @@ spring:
       ddlAuto: update
   cloud:
     function:
-      definition: FraudCheckEventConsumer
+      definition: fraudCheckEventConsumer
     stream:
       defaultBinder: kafka
       bindings:
-
-        resultFraud-out-0: #bu binding mesajlar? start-loan topic gönderir
+        resultFraud-out-0: #bu binding mesajlar? start-loan topic gï¿½nderir
           destination: result-fraud
           content-type: application/json
 
-        FraudCheckEventConsumer-in-0:
+        fraudCheckEventConsumer-in-0:
           destination: check-fraud
           content-type: application/json
           group: fraud-service-group

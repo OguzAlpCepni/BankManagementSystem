@@ -17,7 +17,7 @@ public class FraudConsumer {
 
     private final FraudService fraudService;
 
-    public Consumer<FraudCheckEvent> FraudCheckEventConsumer() {
+    public Consumer<FraudCheckEvent> fraudCheckEventConsumer() {
         return fraudCheckEvent -> {
             log.info("event came the fraud check consumer: {}",fraudCheckEvent);
             try {

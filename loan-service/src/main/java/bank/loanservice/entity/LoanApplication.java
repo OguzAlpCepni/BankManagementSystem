@@ -40,8 +40,7 @@ public class LoanApplication {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private LoanStatus status;
-    @Column(nullable = false)
-    private BigDecimal interestRate;
+
 
     //audit
     @CreationTimestamp

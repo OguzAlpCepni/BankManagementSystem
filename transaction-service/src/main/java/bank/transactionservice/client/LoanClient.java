@@ -11,6 +11,6 @@ import java.util.UUID;
 public interface LoanClient {
 
     @GetMapping("/api/v1/loan-application/credit-score/{customerId}")
-    ResponseEntity<Integer> getCreditScore(@PathVariable("customerId") UUID customerId);
+    ResponseEntity<Integer> getCreditScore(@PathVariable UUID customerId);
 
 }
