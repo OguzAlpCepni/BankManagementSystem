@@ -10,7 +10,7 @@ import java.util.UUID;
 @FeignClient("loan-service")
 public interface LoanClient {
 
-    @GetMapping("/api/v1/loan-application/credit-scre/{customerId}")
+    @GetMapping("/api/v1/loan-application/credit-score/{customerId}")
     ResponseEntity<Integer> getCreditScore(@PathVariable("customerId") UUID customerId);
 
 }

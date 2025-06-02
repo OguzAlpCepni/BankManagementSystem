@@ -10,19 +10,28 @@
         <module name="bank-common" />
         <module name="discovery-server" />
       </profile>
+      <profile name="Annotation profile for loan-service" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <processorPath>
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
+        </processorPath>
+        <module name="loan-service" />
+      </profile>
       <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath useClasspath="false">
+        <processorPath>
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
-        <module name="customer-service" />
-        <module name="loan-service" />
         <module name="Fraud-Service" />
         <module name="transaction-service" />
         <module name="user-service" />
         <module name="account-service" />
+        <module name="customer-service" />
         <module name="transfer-service" />
       </profile>
     </annotationProcessing>

@@ -14,7 +14,7 @@ spring:
       ddlAuto: update
   cloud:
     function:
-      definition: LoanEventConsumer
+      definition: LoanEventConsumer;underwritingCompleted;underwritingRejected
     stream:
       defaultBinder: kafka
       bindings:
@@ -27,6 +27,19 @@ spring:
           destination: loan-completed-topic
           content-type: application/json
           group: loan-service-group
+
+        underwritingCompleted-in-0:
+          destination: underwritingComplete-fraud
+          content-type: application/json
+          group: underwritingCompleted-group
+
+        underwritingRejected-in-0:
+          destination: underwritingRejected-fraud
+          content-type: application/json
+          group: underwritingRejected-group
+
+
+
       kafka:
         binder:
           brokers: localhost:9092

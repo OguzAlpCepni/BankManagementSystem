@@ -70,6 +70,8 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
+    volumes:
+      - mongodb_data:/data/db
 
   # loan service db
   postgres5491:
@@ -136,3 +138,4 @@ volumes:
   postgres5461_data:
   postgres5491_data:
   postgres5495_data:
+  mongodb_data:

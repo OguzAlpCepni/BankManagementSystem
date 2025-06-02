@@ -4,9 +4,8 @@ import io.github.oguzalpcepni.security.configuration.BaseSecurityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -19,51 +18,79 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // Önce ortak güvenlik ayarlarını uygula
         http = baseSecurityService.configureCoreSecurity(http);
-        
-        // Account-service'e özel yetkilendirme kuralları
+
         http.authorizeHttpRequests(auth -> auth
-                // Hesap doğrulama ve işlem yapma endpointleri - sadece servisler arası iletişim için
-                .requestMatchers(
-                    "/api/v1/accounts/*/validate", 
-                    "/api/v1/accounts/iban/*/validate",
-                    "/api/v1/accounts/*/balance-check",
-                    "/api/v1/accounts/*/debit",
-                    "/api/v1/accounts/*/credit",
-                    "/api/v1/accounts/*/compensate"
-                ).hasAuthority("ADMIN")
-                
-                // Temel hesap bilgileri görüntüleme - müşteriler erişebilir
-                .requestMatchers(
-                    "/api/v1/accounts/*",
-                    "/api/v1/accounts/iban/*"
-                ).hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
-                
-                // Bireysel hesap işlemleri
-                .requestMatchers("/api/v1/individual-accounts/*/withdraw", 
-                                "/api/v1/individual-accounts/*/deposit")
-                .hasAnyAuthority("CUSTOMER","ADMIN")
-                
-                // Kurumsal hesap işlemleri
-                .requestMatchers("/api/v1/corporate-accounts/*/withdraw", 
-                                "/api/v1/corporate-accounts/*/deposit")
-                .hasAnyAuthority("CUSTOMER", "EMPLOYEE","ADMIN")
-                
-                // Hesap listeleme işlemleri - yönetici ve çalışanlar
-                .requestMatchers("/api/v1/individual-accounts",
-                                "/api/v1/corporate-accounts")
-                .hasAnyAuthority("ADMIN", "EMPLOYEE")
-                
-                // Hesap durumu güncelleme - sadece yönetici ve çalışanlar
-                .requestMatchers("/api/v1/individual-accounts/*/status",
-                                "/api/v1/corporate-accounts/*/status")
-                .hasAnyAuthority("ADMIN", "EMPLOYEE")
-                
-                // Hesap oluşturma - herkes yapabilir (müşteri kayıt sonrası)
-                .requestMatchers("/api/v1/individual-accounts", 
-                                "/api/v1/corporate-accounts")
+                // ----------------------
+                // Temel Hesap İşlemleri
+                // ----------------------
+                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/{id}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/iban/{iban}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+
+                // Servisler arası iletişim için internal endpoint'ler
+                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/{id}/validate")
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/iban/{iban}/validate")
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/{id}/balance-check")
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{id}/debit")
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/credit")
+                .hasAuthority("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/compensate")
+                .hasAuthority("ADMIN")
+
+                // ----------------------
+                // Kurumsal Hesaplar
+                // ----------------------
+                .requestMatchers(HttpMethod.POST, "/api/v1/corporate-accounts")
                 .permitAll()
-                
-                // Diğer tüm endpointler için authentication gerekli 
+                .requestMatchers(HttpMethod.GET, "/api/v1/corporate-accounts")
+                .hasAnyAuthority("ADMIN", "EMPLOYEE")
+                .requestMatchers(HttpMethod.GET, "/api/v1/corporate-accounts/{id}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/corporate-accounts/customer/{customerId}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/corporate-accounts/iban/{iban}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/corporate-accounts/tax-number/{taxNumber}")
+                .hasAnyAuthority("ADMIN", "EMPLOYEE")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/corporate-accounts/{id}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/corporate-accounts/{id}/deposit")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/corporate-accounts/{id}/withdraw")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/corporate-accounts/{id}/status")
+                .hasAnyAuthority("ADMIN", "EMPLOYEE")
+
+                // ----------------------
+                // Bireysel Hesaplar
+                // ----------------------
+                .requestMatchers(HttpMethod.POST, "/api/v1/individual-accounts")
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/individual-accounts")
+                .hasAnyAuthority("ADMIN", "EMPLOYEE")
+                .requestMatchers(HttpMethod.GET, "/api/v1/individual-accounts/{id}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/individual-accounts/customer/{customerId}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.GET, "/api/v1/individual-accounts/iban/{iban}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/individual-accounts/{id}")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/individual-accounts/{id}/deposit")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/individual-accounts/{id}/withdraw")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .requestMatchers(HttpMethod.PATCH, "/api/v1/individual-accounts/{id}/status")
+                .hasAnyAuthority("ADMIN", "EMPLOYEE")
+
+                // ----------------------
+                // Varsayılan Kurallar
+                // ----------------------
                 .anyRequest().authenticated()
         );
         
