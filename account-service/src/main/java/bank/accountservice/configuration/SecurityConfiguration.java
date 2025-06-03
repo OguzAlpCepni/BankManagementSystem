@@ -36,9 +36,9 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/api/v1/accounts/{id}/balance-check")
                 .hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{id}/debit")
-                .hasAuthority("ADMIN")
+                .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/credit")
-                .hasAuthority("ADMIN")
+                .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/compensate")
                 .hasAuthority("ADMIN")
 

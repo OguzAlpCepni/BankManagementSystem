@@ -37,8 +37,8 @@ public class LoanApplicationConsumer {
         return fraudResultEvent -> {
             log.info("fraud result came to transaction-service consumer");
             try {
-                loanTransactionService.onFraudResult(fraudResultEvent);
                 log.info("event goes to transaction-service method");
+                loanTransactionService.onFraudResult(fraudResultEvent);
             }catch (BusinessException businessException){
                 throw new BusinessException(businessException.getMessage());
             }

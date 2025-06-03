@@ -74,4 +74,9 @@ public class TransferController {
         TransferResponse response = transferService.updateTransferStatus(transferId, status);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/{transferTransactionId}/transferTransactionId")
+    public ResponseEntity<String> getStatusByTransferTransactionId(@PathVariable String transferTransactionId){
+        return ResponseEntity.ok(transferService.getStatusByTransferTransactionId(transferTransactionId));
+    }
 } 

@@ -154,6 +154,12 @@ public class TransferServiceImpl implements TransferService {
         return mapToTransferResponse(transfer);
     }
 
+    @Override
+    public String getStatusByTransferTransactionId(String transferTransactionId) {
+        Transfer transfer  = transferRepository.findByTransactionReference(String.valueOf(transferTransactionId));
+        return transfer.getStatus().name();
+    }
+
     private Transfer createTransferEntity(TransferRequest request) {
         Transfer transfer = new Transfer();
         transfer.setSourceAccountId(request.getSourceAccountId());

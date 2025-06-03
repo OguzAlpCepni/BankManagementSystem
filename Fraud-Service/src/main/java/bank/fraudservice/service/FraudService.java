@@ -4,5 +4,5 @@ import io.github.oguzalpcepni.event.FraudCheckEvent;
 
 public interface FraudService {
 
-    public void handleFraudCheck(FraudCheckEvent fraudCheckEvent);
+    void handleFraudCheck(FraudCheckEvent fraudCheckEvent);
 }

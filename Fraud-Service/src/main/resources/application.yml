@@ -18,7 +18,7 @@ spring:
     stream:
       defaultBinder: kafka
       bindings:
-        resultFraud-out-0: #bu binding mesajlar? start-loan topic g�nderir
+        resultFraud-out-0:
           destination: result-fraud
           content-type: application/json
 

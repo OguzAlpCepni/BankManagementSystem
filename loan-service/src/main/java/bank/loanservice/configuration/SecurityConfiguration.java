@@ -31,7 +31,7 @@ public class SecurityConfiguration {
 
                 // Krediyi onaylayıp para transferi yapma - sadece çalışan ve yöneticiler
                 .requestMatchers(HttpMethod.POST, "/api/v1/loan-application/{loanId}/transfer")
-                .hasAnyAuthority("CUSTOMER","EMPLOYEE", "ADMIN")
+                .permitAll()
 
                 // Diğer tüm endpointler için kimlik doğrulama gerekli
                 .anyRequest().authenticated()

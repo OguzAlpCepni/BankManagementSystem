@@ -21,5 +21,5 @@ public interface TransferRepository extends JpaRepository<Transfer, UUID> {
     
     List<Transfer> findByTargetAccountId(UUID targetAccountId);
     
-    List<Transfer> findByTransactionReference(String transactionReference);
+    Transfer findByTransactionReference(String transactionReference);
 } 

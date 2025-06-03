@@ -18,10 +18,10 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http = baseSecurityService.configureCoreSecurity(http);
         //özel yapılandırmalar authentication işlemleri burada yapılması lazım
+
         http.authorizeHttpRequests(auth -> auth
         // POST /transfers - Müşteri ve Admin
-            .requestMatchers(HttpMethod.POST, "/api/v1/transfers")
-                .hasAnyAuthority("CUSTOMER", "ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/v1/transfers").permitAll()
 
                 // GET tekil transfer sorgulamaları
                 .requestMatchers(HttpMethod.GET,
@@ -36,14 +36,15 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/api/v1/transfers/status/{status}")
                 .hasAnyAuthority("EMPLOYEE", "ADMIN")
 
+
                 // PUT transfer iptali (Müşteri sadece kendi transferini iptal edebilir)
                 .requestMatchers(HttpMethod.PUT, "/api/v1/transfers/{transferId}/cancel")
                 .hasAnyAuthority("CUSTOMER", "ADMIN", "EMPLOYEE")
 
                 // PUT transfer durum güncelleme (Sistem ve yetkililer)
-                .requestMatchers(HttpMethod.PUT, "/api/v1/transfers/{transferId}/status")
-                .hasAnyAuthority("ADMIN", "EMPLOYEE", "SERVICE")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/transfers/{transferId}/status").hasAnyAuthority("ADMIN", "EMPLOYEE", "SERVICE")
 
+                .requestMatchers(HttpMethod.GET, "/api/v1/transfers/{transferTransactionId}/transferTransactionId").permitAll()
                 // Tüm diğer istekler için authentication zorunlu
                 .anyRequest().authenticated()
         );

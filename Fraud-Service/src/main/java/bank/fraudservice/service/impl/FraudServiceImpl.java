@@ -35,6 +35,7 @@ public class FraudServiceImpl implements FraudService {
 
     }
     private boolean evaluateFraud(Integer creditScore, BigDecimal amount) {
+
         if (creditScore == null || amount == null) {
             // Eksik veri varsa reddedelim
             return false;

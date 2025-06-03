@@ -17,4 +17,5 @@ public interface TransferService {
     List<TransferResponse> getTransfersByTargetAccountId(UUID targetAccountId);
     TransferResponse cancelTransfer(UUID transferId);
     TransferResponse updateTransferStatus(UUID transferId, TransferStatus status);
-} 
+    String getStatusByTransferTransactionId(String transferTransactionId);
+}

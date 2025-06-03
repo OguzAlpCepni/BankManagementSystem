@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -71,7 +72,7 @@ public class LoanServiceImpl implements LoanService {
         underwriting.setFraudCheckPassed(event.isFraudCheckPassed());
         underwriting.setEvaluatedAt(LocalDateTime.now());
         underwriting.setNotes("underwriting completed");
-        underWritingRepository.save(underwriting);
+        loanApplication.setUnderwriting(underwriting);
 
         loanApplication.setStatus(LoanStatus.UNDERWRITTEN);
         loanApplicationRepository.save(loanApplication);
@@ -87,6 +88,7 @@ public class LoanServiceImpl implements LoanService {
         if (loanApplication.getStatus() != LoanStatus.UNDERWRITTEN) {
             throw new BusinessException("Loan is not in UNDERWRITTEN state: " + loanApplication.getId());
         }
+
         TransferRequest transferRequest = new TransferRequest();
         // bizim vermemiz gerekenler // buraya bir incele bakalım hata olabilir
         transferRequest.setSourceAccountId(UUID.fromString("19222397-bd78-4cf6-b633-0003538a3a58")); // banka id olarak dusun
@@ -97,28 +99,25 @@ public class LoanServiceImpl implements LoanService {
         transferRequest.setCurrency("TRY");
         transferRequest.setTransferType("INTERNAL");
         transferRequest.setDescription("loan transferred to you");
-        transferRequest.setTransactionReference("TRX-45443612");
+        transferRequest.setTransactionReference("TR-" + generateRandomString(8));
 
         LoanTransferResponse loanTransferResponse = new LoanTransferResponse();
 
         try {
             ResponseEntity<TransferResponse> transferResponse =transferClient.initiateTransfer(transferRequest);
-            TransferResponse body = transferResponse.getBody();
+            if (transferResponse != null && transferResponse.getBody() != null) {
+                String transactionReference = transferResponse.getBody().getTransactionReference();
 
-            // Önce body null değil mi kontrol ediyoruz
-            if (body != null && body.getStatus().equals("COMPLETED")) {
-                loanApplication.setStatus(LoanStatus.APPROVED);
-                loanTransferResponse.setNewStatus(String.valueOf(loanApplication.getStatus()));
-                loanTransferResponse.setTransferStatus("COMPLETED");
-                loanTransferResponse.setMessage("transfer successful");
-            } else {
-                // Ya body null, ya status COMPLETED değil: transfer başarısız kabul edebilirsin
-                loanApplication.setStatus(LoanStatus.TRANSFER_FAILED);
-                loanTransferResponse.setNewStatus(String.valueOf(loanApplication.getStatus()));
-                loanTransferResponse.setTransferStatus("FAILED");
-                loanTransferResponse.setMessage("transfer failed");
+                ResponseEntity<String> transferLastStatus = transferClient.getStatusByTransferTransactionId(transactionReference);
 
+                if (transferLastStatus != null && transferLastStatus.getBody().equals("COMPLETED")) {
+                    loanApplication.setStatus(LoanStatus.APPROVED);
+                    loanTransferResponse.setNewStatus(String.valueOf(loanApplication.getStatus()));
+                    loanTransferResponse.setTransferStatus("COMPLETED");
+                    loanTransferResponse.setMessage("transfer successful");
+                }
             }
+
         }catch (BusinessException businessException){
             // Feign/HTTP çağrısı sırasında exception fırladıysa
             loanApplication.setStatus(LoanStatus.TRANSFER_FAILED);
@@ -142,7 +141,7 @@ public class LoanServiceImpl implements LoanService {
         underwriting.setFraudCheckPassed(event.isFraudCheckPassed());
         underwriting.setEvaluatedAt(LocalDateTime.now());
         underwriting.setNotes("underwriting rejected");
-        underWritingRepository.save(underwriting);
+        loanApplication.setUnderwriting(underwriting);
         // 3) LoanApplication durumunu güncelle (REJECTED)
         loanApplication.setStatus(LoanStatus.REJECTED);
         loanApplicationRepository.save(loanApplication);
@@ -177,11 +176,23 @@ public class LoanServiceImpl implements LoanService {
 
     private LoanApplicationCreatedEvent loanApplicationMapToEvent(LoanApplication loanApplication) {
         LoanApplicationCreatedEvent loanApplicationCreatedEvent = new LoanApplicationCreatedEvent();
+        loanApplicationCreatedEvent.setLoanId(loanApplication.getId());
         loanApplicationCreatedEvent.setCustomerId(loanApplication.getCustomerId());
         loanApplicationCreatedEvent.setAmount(loanApplication.getAmount());
         loanApplicationCreatedEvent.setInstallmentCount(loanApplication.getInstallmentCount());
         loanApplicationCreatedEvent.setPurpose(loanApplication.getPurpose());
         return loanApplicationCreatedEvent;
     }
+    private static String generateRandomString(int length) {
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
 
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(characters.length());
+            sb.append(characters.charAt(randomIndex));
+        }
+
+        return sb.toString();
+    }
 }

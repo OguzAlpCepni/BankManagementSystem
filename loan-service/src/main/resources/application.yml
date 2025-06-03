@@ -17,7 +17,7 @@ spring:
 
   cloud:
     function:
-      definition: LoanEventConsumer;underwritingCompleted;underwritingRejected
+      definition: underwritingCompleted;underwritingRejected
 
     stream:
       defaultBinder: kafka
@@ -25,10 +25,6 @@ spring:
         loan-out-0:
           destination: start-loan
           content-type: application/json
-        LoanEventConsumer-in-0:
-          destination: loan-completed-topic
-          content-type: application/json
-          group: loan-service-group
         underwritingCompleted-in-0:
           destination: underwritingComplete-fraud
           content-type: application/json

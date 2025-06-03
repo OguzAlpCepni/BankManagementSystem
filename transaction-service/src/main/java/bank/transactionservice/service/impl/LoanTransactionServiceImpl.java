@@ -55,9 +55,12 @@ public class LoanTransactionServiceImpl implements LoanTransactionService {
 
     @Override
     public void onFraudResult(FraudResultEvent fraudResultEvent) {
-        LoanTransaction loanTransaction = loanTransactionRepository.findById(fraudResultEvent.getLoanId()).orElseThrow(() -> new RuntimeException("loan transaction not found"));
+        LoanTransaction loanTransaction = loanTransactionRepository.findByLoanId(fraudResultEvent.getLoanId()).orElseThrow(() -> new RuntimeException("loan transaction not found"));
 
-        if(fraudResultEvent.isFraudCheckPassed()){
+        boolean passed = fraudResultEvent.isFraudCheckPassed();
+        loanTransaction.setFraudCheckPassed(passed);
+
+        if(passed){
             loanTransaction.setStatus(TransactionStatus.UNDERWRITING_COMPLETED);
             loanTransactionRepository.save(loanTransaction);
             kafkaLoanProducerService.sendFraudCompletedResultEvent(loanTransaction);
@@ -68,5 +71,8 @@ public class LoanTransactionServiceImpl implements LoanTransactionService {
             loanTransactionRepository.save(loanTransaction);
             kafkaLoanProducerService.sendFraudRejectedResultEvent(loanTransaction);
         }
+
+        // 3. Veritabanına kaydedin
+        loanTransactionRepository.save(loanTransaction);
     }
 }

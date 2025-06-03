@@ -6,6 +6,7 @@ import io.github.oguzalpcepni.exceptions.type.BusinessException;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
@@ -17,12 +18,12 @@ public class FraudConsumer {
 
     private final FraudService fraudService;
 
+    @Bean
     public Consumer<FraudCheckEvent> fraudCheckEventConsumer() {
         return fraudCheckEvent -> {
             log.info("event came the fraud check consumer: {}",fraudCheckEvent);
             try {
                 fraudService.handleFraudCheck(fraudCheckEvent);
-                log.info("event going to fraud service");
             }catch (BusinessException businessException){
                 throw new BusinessException(businessException.getMessage());
             }
