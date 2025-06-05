@@ -10,28 +10,21 @@
         <module name="bank-common" />
         <module name="discovery-server" />
       </profile>
-      <profile name="Annotation profile for loan-service" enabled="true">
-        <sourceOutputDir name="target/generated-sources/annotations" />
-        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
-        <outputRelativeToContentRoot value="true" />
-        <processorPath>
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-        </processorPath>
-        <module name="loan-service" />
-      </profile>
       <profile name="Annotation profile for user-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <processorPath>
+        <processorPath useClasspath="false">
+          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
+        <module name="payment-service" />
+        <module name="customer-service" />
+        <module name="loan-service" />
         <module name="Fraud-Service" />
         <module name="transaction-service" />
         <module name="user-service" />
         <module name="account-service" />
-        <module name="customer-service" />
         <module name="transfer-service" />
       </profile>
     </annotationProcessing>
@@ -48,6 +41,7 @@
       <module name="customer-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="loan-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
       <module name="transaction-service" options="-parameters" />
       <module name="transfer-service" options="-parameters" />
       <module name="user-service" options="-parameters" />
