@@ -5,6 +5,7 @@ import io.github.oguzalpcepni.dto.payment.PaymentStatusUpdateDTO;
 import io.github.oguzalpcepni.event.PaymentStatusUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.function.Consumer;
@@ -15,6 +16,7 @@ import java.util.function.Consumer;
 public class KafkaConsumerService {
     private final PaymentService paymentService;
 
+    @Bean
     public Consumer<PaymentStatusUpdateEvent> paymentStatusUpdateEventConsumer() {
         log.info("Payment status update event consumer started");
         return paymentStatusUpdateEvent -> {

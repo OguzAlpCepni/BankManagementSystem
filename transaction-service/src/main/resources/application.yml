@@ -14,7 +14,7 @@ spring:
       ddlAuto: update
   cloud:
     function:
-      definition: handleTransferDebitedEvent; loanApplicationCreatedEventConsumer; resultFraudConsumer
+      definition: handleTransferDebitedEvent; loanApplicationCreatedEventConsumer; resultFraudConsumer; paymentRequestedConsumer
     stream:
       defaultBinder: kafka
       bindings:
@@ -49,6 +49,11 @@ spring:
         underwritingRejected-out-0:
           destination: underwritingRejected-fraud
           content-type: application/json
+
+        paymentRequested-in-0:
+          destination: paymentstart-payment
+          content-type: application/json
+          group: paymentStart-group
 
       kafka:
         binder:

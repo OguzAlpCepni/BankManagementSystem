@@ -16,7 +16,23 @@ spring:
       ddlAuto: update
 
 
+  cloud:
+    function:
+      definition: paymentStatusUpdateEventConsumer
 
+    stream:
+      defaultBinder: kafka
+      bindings:
+        paymentRequested-out-0:
+          destination: paymentstart-payment
+          content-type: application/json
+        paymentStatusUpdate-in-0:
+          destination: StatusUpdate-paymentstatus
+          content-type: application/json
+          group: paymentStatusUpdate-group
+      kafka:
+        binder:
+          brokers: localhost:9092
 
 
 server:
