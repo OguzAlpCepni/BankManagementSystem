@@ -4,6 +4,7 @@ import bank.accountservice.entity.Account;
 import bank.accountservice.entity.AccountStatus;
 import bank.accountservice.repository.AccountRepository;
 import bank.accountservice.service.AccountService;
+import io.github.oguzalpcepni.dto.accountdto.AccountDto;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +24,58 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
 
     @Override
-    public Optional<Account> findAccountById(UUID id) {
-        return accountRepository.findById(id);
+    public Optional<AccountDto> findAccountById(UUID id) {
+        Optional<Account> account = accountRepository.findById(id);
+        if (account.isPresent()) {
+            Account acc = account.get();
+            AccountDto accountDto = new AccountDto();
+
+            // Map fields from Account entity to AccountDto
+            accountDto.setId(acc.getId());
+            accountDto.setIban(acc.getIban());
+            accountDto.setType(acc.getType().name());  // Convert enum to string
+            accountDto.setStatus(acc.getStatus().name());  // Convert enum to string
+            accountDto.setBalance(acc.getBalance());
+            accountDto.setOverdraftLimit(acc.getOverdraftLimit());
+            accountDto.setCurrency(acc.getCurrency().name());  // Convert enum to string
+            accountDto.setCustomerId(acc.getCustomerId());
+
+            // Map fields from BaseEntity
+            accountDto.setVersion(acc.getVersion());
+            accountDto.setCreatedAt(acc.getCreatedAt());
+            accountDto.setUpdatedAt(acc.getUpdatedAt());
+
+            return Optional.of(accountDto);
+        }
+        return Optional.empty();
     }
 
     @Override
-    public Optional<Account> findAccountByIban(String iban) {
-        return accountRepository.findByIban(iban);
+    public Optional<AccountDto> findAccountByIban(String iban) {
+        Optional<Account> account = accountRepository.findByIban(iban);
+        if (account.isPresent()) {
+            Account acc = account.get();
+            AccountDto accountDto = new AccountDto();
+
+            // Map fields from Account entity to AccountDto
+            accountDto.setId(acc.getId());
+            accountDto.setIban(acc.getIban());
+            accountDto.setType(acc.getType().name());  // Convert enum to string
+            accountDto.setStatus(acc.getStatus().name());  // Convert enum to string
+            accountDto.setBalance(acc.getBalance());
+            accountDto.setOverdraftLimit(acc.getOverdraftLimit());
+            accountDto.setCurrency(acc.getCurrency().name());  // Convert enum to string
+            accountDto.setCustomerId(acc.getCustomerId());
+
+            // Map fields from BaseEntity
+            accountDto.setVersion(acc.getVersion());
+            accountDto.setCreatedAt(acc.getCreatedAt());
+            accountDto.setUpdatedAt(acc.getUpdatedAt());
+
+            return Optional.of(accountDto);
+        }
+        return Optional.empty();
+
     }
     
     @Override

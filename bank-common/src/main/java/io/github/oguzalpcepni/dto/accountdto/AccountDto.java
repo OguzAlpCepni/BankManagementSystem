@@ -23,7 +23,7 @@ public class AccountDto {
     private BigDecimal balance;
     private BigDecimal overdraftLimit;
     private String currency;
-    private Long customerId;
+    private UUID customerId;
     private int version;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

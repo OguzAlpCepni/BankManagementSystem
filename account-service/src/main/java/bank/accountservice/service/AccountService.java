@@ -1,14 +1,15 @@
 package bank.accountservice.service;
 
 import bank.accountservice.entity.Account;
+import io.github.oguzalpcepni.dto.accountdto.AccountDto;
 
 import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
 public interface AccountService {
-    Optional<Account> findAccountById(UUID id);
-    Optional<Account> findAccountByIban(String iban);
+    Optional<AccountDto> findAccountById(UUID id);
+    Optional<AccountDto> findAccountByIban(String iban);
     
     void validateAccount(UUID id);
     void validateAccount(String iban);

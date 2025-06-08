@@ -1,12 +1,14 @@
 package bank.accountservice.controller;
 
 import bank.accountservice.service.AccountService;
+import io.github.oguzalpcepni.dto.accountdto.AccountDto;
 import io.github.oguzalpcepni.dto.accountdto.CreditRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -17,12 +19,12 @@ public class AccountController {
     private final AccountService accountService;
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getAccountById(@PathVariable UUID id) {
+    public ResponseEntity<Optional<AccountDto>> getAccountById(@PathVariable UUID id) {
         return ResponseEntity.ok(accountService.findAccountById(id));
     }
 
     @GetMapping("/iban/{iban}")
-    public ResponseEntity<?> getAccountByIban(@PathVariable String iban) {
+    public ResponseEntity<Optional<AccountDto>> getAccountByIban(@PathVariable String iban) {
         return ResponseEntity.ok(accountService.findAccountByIban(iban));
     }
 

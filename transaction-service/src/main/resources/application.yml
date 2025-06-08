@@ -54,7 +54,9 @@ spring:
           destination: paymentstart-payment
           content-type: application/json
           group: paymentStart-group
-
+        paymentStatusUpdate-out-0:
+          destination: StatusUpdate-paymentstatus
+          content-type: application/json
       kafka:
         binder:
           brokers: localhost:9092

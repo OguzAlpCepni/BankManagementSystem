@@ -4,5 +4,5 @@ import io.github.oguzalpcepni.event.PaymentRequestedEvent;
 
 public interface PaymentService {
 
-    public void handlePaymentRequested(PaymentRequestedEvent paymentRequestedEvent);
+    void handlePaymentRequested(PaymentRequestedEvent paymentRequestedEvent);
 }
