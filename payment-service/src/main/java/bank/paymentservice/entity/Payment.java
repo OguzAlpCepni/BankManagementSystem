@@ -85,4 +85,7 @@ public class Payment {
 
     @Column(name = "processed_at")
     private LocalDateTime processedAt;
+
+    @Version
+    private Long version;
 }

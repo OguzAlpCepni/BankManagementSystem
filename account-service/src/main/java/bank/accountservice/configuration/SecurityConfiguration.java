@@ -24,7 +24,7 @@ public class SecurityConfiguration {
                 // Temel Hesap İşlemleri
                 // ----------------------
                 .requestMatchers(HttpMethod.GET, "/api/v1/accounts/{id}")
-                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
+                .permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/accounts/iban/{iban}")
                 .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
@@ -40,7 +40,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/credit")
                 .permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/compensate")
-                .hasAuthority("ADMIN")
+                .permitAll()
 
                 // ----------------------
                 // Kurumsal Hesaplar

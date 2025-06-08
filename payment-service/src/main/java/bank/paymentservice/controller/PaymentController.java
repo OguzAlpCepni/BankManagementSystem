@@ -25,15 +25,15 @@ public class PaymentController {
     public ResponseEntity<Map<String,Object>> pay(
             @RequestBody Map<String,Object> req
     ) {
-        boolean success = Math.random() < 0.9;
+        boolean success = false;//Math.random() < 0.9;
         if (success) {
             return ResponseEntity.ok(Map.of(
                     "success", true,
-                    "transactionId", UUID.randomUUID().toString(),
+                    "paymentId", UUID.randomUUID().toString(),
                     "message", "Payment processed (mock)"
             ));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+            return ResponseEntity.ok(Map.of(
                     "success", false,
                     "message", "Mock billing failure"
             ));
@@ -41,7 +41,7 @@ public class PaymentController {
     }
 
     @PostMapping("/payBill")
-    public ResponseEntity<PaymentResponseDto> createPayment(PaymentRequestDto paymentRequestDto) {
+    public ResponseEntity<PaymentResponseDto> createPayment(@RequestBody PaymentRequestDto paymentRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentService.createPayment(paymentRequestDto));
     }
 

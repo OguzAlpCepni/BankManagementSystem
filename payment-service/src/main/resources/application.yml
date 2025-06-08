@@ -26,7 +26,7 @@ spring:
         paymentRequested-out-0:
           destination: paymentstart-payment
           content-type: application/json
-        paymentStatusUpdate-in-0:
+        paymentStatusUpdateEventConsumer-in-0:
           destination: StatusUpdate-paymentstatus
           content-type: application/json
           group: paymentStatusUpdate-group

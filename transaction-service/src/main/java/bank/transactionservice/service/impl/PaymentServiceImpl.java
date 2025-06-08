@@ -41,20 +41,22 @@ public class PaymentServiceImpl implements PaymentService {
         // 1. Hesaptan para çek
         try {
             reservationOk = accountClient.debitAccount(accountId,amount,paymentRequestedEvent.getPaymentMethod(),paymentId);
-            if(reservationOk.getBody() != null && !reservationOk.getBody()){
+            if(reservationOk.getBody() == null || !reservationOk.getBody()){
                 errorMessage = "account does not have money enought";
                 log.warn("[TransactionService] Reservation failed for paymentId={}", paymentId);
                 kafkaPaymentProducer.publishStatusUpdate(paymentId, "FAILED", null, errorMessage);
+                return;
             }
             log.info("[TransactionService] Reservation succeeded for paymentId={}", paymentId);
         }catch (BusinessException ex) {
             errorMessage = "Exception during reserve: " + ex.getMessage();
             log.error("[TransactionService] Exception on reserve for paymentId={}: {}", paymentId, ex.getMessage());
             kafkaPaymentProducer.publishStatusUpdate(paymentId, "FAILED", null, errorMessage);
+            return;
         }
 
 
-        boolean isBillingSuccessful;
+        boolean isBillingSuccessful = false;
         try {
             Map<String,Object> req = Map.of(
                     "billerCode", paymentRequestedEvent.getBillerCode(),
@@ -62,6 +64,7 @@ public class PaymentServiceImpl implements PaymentService {
                     "amount", amount
             );
             ResponseEntity<Map<String,Object>> resp = paymentClient.pay(req);
+
             isBillingSuccessful = resp.getStatusCode().is2xxSuccessful()
                     && Boolean.TRUE.equals(Objects.requireNonNull(resp.getBody()).get("success"));
             if (isBillingSuccessful) {
@@ -86,9 +89,19 @@ public class PaymentServiceImpl implements PaymentService {
             }catch (BusinessException businessException){
                 errorMessage = "debit failed: " + businessException.getMessage();
                 log.error("[TransactionService] Exception on billing for paymentId={}", paymentId);
-                ResponseEntity<Optional<AccountDto>> account = accountClient.getAccountById(paymentRequestedEvent.getAccountId());
-                CreditRequest creditRequest = new CreditRequest(amount, Objects.requireNonNull(account.getBody()).get().getCurrency(),paymentId,paymentRequestedEvent.getPaymentMethod());
-                accountClient.compensateDebit(account.getBody().get().getIban(),creditRequest);
+                Optional<AccountDto> accountDto = Optional.ofNullable(accountClient.getAccountById(accountId).getBody()).orElse(Optional.empty());
+                if (accountDto.isEmpty()) {
+                    log.error("[TransactionService] Account not found for id={}", accountId);
+                    kafkaPaymentProducer.publishStatusUpdate(paymentId, "FAILED", null, "Account not found");
+                    return;
+                }
+                CreditRequest creditRequest = new CreditRequest(
+                        amount,
+                        accountDto.get().getCurrency(),
+                        paymentId,
+                        paymentRequestedEvent.getPaymentMethod()
+                );
+                accountClient.compensateDebit(accountDto.get().getIban(),creditRequest);
                 kafkaPaymentProducer.publishStatusUpdate(paymentId, "FAILED", null, errorMessage);
             }
         }

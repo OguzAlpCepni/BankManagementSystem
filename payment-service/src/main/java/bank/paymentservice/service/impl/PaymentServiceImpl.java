@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -59,26 +60,32 @@ public class PaymentServiceImpl implements PaymentService {
         return mapToDto(payment);
     }
 
-    private Payment mapToPayment(PaymentRequestDto paymentRequestDto) {
+    private Payment mapToPayment(PaymentRequestDto dto) {
         Payment payment = new Payment();
 
-        payment.setAmount(paymentRequestDto.getAmount());
-        payment.setPaymentReference(UUID.randomUUID().toString()); // Unique referans
+        // 2️⃣ Temel alanlar
+        payment.setPaymentReference(UUID.randomUUID().toString());
+        payment.setUserId(dto.getUserId());
+        payment.setAccountId(dto.getAccountId());
+        payment.setBillType(BillType.valueOf(dto.getBillType()));
+        payment.setBillerCode(dto.getBillerCode());
+        payment.setSubscriberNumber(dto.getSubscriberNumber());
+
+        // 3️⃣ Tutarlar (mutlaka set et!)
+        payment.setAmount(dto.getAmount());
+        payment.setBillAmount(dto.getBillAmount());
+        payment.setCommissionAmount(
+                dto.getCommissionAmount() != null ? dto.getCommissionAmount() : BigDecimal.ZERO
+        );
+
+        // 4️⃣ Statü ve Zaman
         payment.setPaymentStatus(PaymentStatus.PENDING);
         payment.setCreatedAt(LocalDateTime.now());
-        payment.setUserId(paymentRequestDto.getUserId());
-        payment.setAccountId(paymentRequestDto.getAccountId());
 
-        payment.setBillType(BillType.valueOf(paymentRequestDto.getBillType()));
-        payment.setBillerCode(paymentRequestDto.getBillerCode());
-        payment.setSubscriberNumber(paymentRequestDto.getSubscriberNumber());
-        payment.setBillDescription(paymentRequestDto.getBillDescription());
-        payment.setDueDate(paymentRequestDto.getDueDate());
-        payment.setPaymentMethod(PaymentMethod.valueOf(paymentRequestDto.getPaymentMethod()));
-        payment.setTransactionId(payment.getTransactionId());
-        payment.setBillerResponse(payment.getBillerResponse());
-        payment.setErrorMessage(payment.getErrorMessage());
-        payment.setCreatedAt(payment.getCreatedAt());
+        // 5️⃣ Opsiyonel açıklamalar
+        payment.setBillDescription(dto.getBillDescription());
+        payment.setDueDate(dto.getDueDate());
+        payment.setPaymentMethod(PaymentMethod.valueOf(dto.getPaymentMethod()));
         return payment;
     }
 

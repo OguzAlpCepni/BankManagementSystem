@@ -50,7 +50,7 @@ spring:
           destination: underwritingRejected-fraud
           content-type: application/json
 
-        paymentRequested-in-0:
+        paymentRequestedConsumer-in-0:
           destination: paymentstart-payment
           content-type: application/json
           group: paymentStart-group
