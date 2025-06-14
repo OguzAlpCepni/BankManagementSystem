@@ -25,7 +25,7 @@ public class PaymentController {
     public ResponseEntity<Map<String,Object>> pay(
             @RequestBody Map<String,Object> req
     ) {
-        boolean success = false;//Math.random() < 0.9;
+        boolean success = Math.random() < 0.9;
         if (success) {
             return ResponseEntity.ok(Map.of(
                     "success", true,

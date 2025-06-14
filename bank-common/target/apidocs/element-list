@@ -1,6 +1,9 @@
 io.github.oguzalpcepni
 io.github.oguzalpcepni.annotations
 io.github.oguzalpcepni.dto.accountdto
+io.github.oguzalpcepni.dto.CustomerDto
+io.github.oguzalpcepni.dto.LoansDto
+io.github.oguzalpcepni.dto.payment
 io.github.oguzalpcepni.dto.transferdto
 io.github.oguzalpcepni.dto.userdto
 io.github.oguzalpcepni.event

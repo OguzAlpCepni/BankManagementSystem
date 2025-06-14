@@ -2,7 +2,7 @@ package bank.paymentservice.service;
 
 import io.github.oguzalpcepni.dto.payment.PaymentRequestDto;
 import io.github.oguzalpcepni.dto.payment.PaymentResponseDto;
-import io.github.oguzalpcepni.dto.payment.PaymentStatusUpdateDTO;
+import io.github.oguzalpcepni.dto.payment.PaymentStatusUpdateDTOo;
 
 import java.util.UUID;
 
@@ -17,7 +17,7 @@ public interface PaymentService {
      * Saga Orchestrator veya dış bir listener tarafından,
      * ödeme statüsü güncellemelerini dinleyip işleme sokar.
      */
-    void updatePaymentStatus(PaymentStatusUpdateDTO statusUpdate);
+    void updatePaymentStatus(PaymentStatusUpdateDTOo statusUpdate);
 
     /**
      * Ödeme detaylarını ID ile (veya paymentReference ile) döner.

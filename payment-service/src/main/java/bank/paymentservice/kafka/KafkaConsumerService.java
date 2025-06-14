@@ -1,7 +1,9 @@
 package bank.paymentservice.kafka;
 
 import bank.paymentservice.service.PaymentService;
-import io.github.oguzalpcepni.dto.payment.PaymentStatusUpdateDTO;
+
+
+import io.github.oguzalpcepni.dto.payment.PaymentStatusUpdateDTOo;
 import io.github.oguzalpcepni.event.PaymentStatusUpdateEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +23,7 @@ public class KafkaConsumerService {
         log.info("Payment status update event consumer started");
         return paymentStatusUpdateEvent -> {
             log.info("Payment status update event received");
-            PaymentStatusUpdateDTO paymentStatusUpdateDTO = new PaymentStatusUpdateDTO();
+            PaymentStatusUpdateDTOo paymentStatusUpdateDTO = new PaymentStatusUpdateDTOo();
             paymentStatusUpdateDTO.setPaymentId(paymentStatusUpdateEvent.getPaymentId());
             paymentStatusUpdateDTO.setNewStatus(paymentStatusUpdateEvent.getNewStatus());
             paymentStatusUpdateDTO.setBillerResponse(paymentStatusUpdateEvent.getBillerResponse());

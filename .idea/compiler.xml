@@ -16,11 +16,11 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath>
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
-          <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/unknown/lombok-unknown.jar" />
         </processorPath>
         <module name="payment-service" />
         <module name="customer-service" />
         <module name="loan-service" />
+        <module name="api-gateway" />
         <module name="Fraud-Service" />
         <module name="transaction-service" />
         <module name="user-service" />
@@ -38,6 +38,7 @@
       <module name="Fraud-Service" options="-parameters" />
       <module name="account-service" options="-parameters" />
       <module name="accountservice" options="-parameters" />
+      <module name="api-gateway" options="-parameters" />
       <module name="customer-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="loan-service" options="-parameters" />

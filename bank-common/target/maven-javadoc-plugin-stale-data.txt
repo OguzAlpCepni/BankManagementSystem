@@ -20,13 +20,16 @@
 -docencoding
 'UTF-8'
 -doctitle
-'bank-common 1.1.2 API'
+'bank-common 1.1.3 API'
 -use
 -version
 -windowtitle
-'bank-common 1.1.2 API'
+'bank-common 1.1.3 API'
 io.github.oguzalpcepni.annotations
 io.github.oguzalpcepni.dto.accountdto
+io.github.oguzalpcepni.dto.CustomerDto
+io.github.oguzalpcepni.dto.LoansDto
+io.github.oguzalpcepni.dto.payment
 io.github.oguzalpcepni.dto.transferdto
 io.github.oguzalpcepni.dto.userdto
 io.github.oguzalpcepni.event
@@ -48,15 +51,34 @@ io.github.oguzalpcepni.security.jwt
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/accountdto/CreditRequest.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/accountdto/IndividualAccountDto.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/accountdto/IndividualAccountResponse.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/accountdto/LoanAccountDto.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/accountdto/TransactionRequest.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/accountdto/TransactionResponse.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/accountdto/UpdateAccountStatusRequest.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/CustomerDto/CustomerRequestDto.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/CustomerDto/CustomerResponseDto.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/LoansDto/LoanRequest.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/LoansDto/LoanResponse.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/LoansDto/LoanStatusResponse.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/LoansDto/LoanTransferResponse.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/payment/BillInquiryDto.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/payment/PaymentRequestDto.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/payment/PaymentResponseDto.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/payment/PaymentStatusUpdateDTO.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/payment/QrPaymentDto.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/transferdto/TransferRequest.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/transferdto/TransferResponse.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/userdto/UserLoginRequest.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/userdto/UserRegisterRequest.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/dto/userdto/UserRegisterResponse.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/AccountEvent.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/FraudCheckEvent.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/FraudResultEvent.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/LoanApplicationCreatedEvent.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/LoanUnderwritingCompletedEvent.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/LoanUnderwritingRejectedEvent.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/PaymentRequestedEvent.java'
+'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/PaymentStatusUpdateEvent.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/TransactionEvent.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/event/TransferEvent.java'
 'C:/Users/MONSTER/IdeaProjects/BankManagementSystem/bank-common/src/main/java/io/github/oguzalpcepni/exceptions/GlobalExceptionHandler.java'
@@ -118,25 +140,25 @@ C:\Users\MONSTER\.m2\repository\org\springframework\security\spring-security-cor
 C:\Users\MONSTER\.m2\repository\org\springframework\security\spring-security-crypto\6.2.1\spring-security-crypto-6.2.1.jar = 1712495870842
 C:\Users\MONSTER\.m2\repository\org\springframework\security\spring-security-web\6.2.1\spring-security-web-6.2.1.jar = 1712495871187
 C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\src\main\java = 1745683782578
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\generated-sources\annotations = 1747508586702
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\allclasses-index.html = 1747508599435
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\allpackages-index.html = 1747508599441
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\copy.svg = 1747508599539
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\element-list = 1747508598871
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\help-doc.html = 1747508599526
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\index-all.html = 1747508599511
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\index.html = 1747508599381
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\link.svg = 1747508599541
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\member-search-index.js = 1747508599463
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\module-search-index.js = 1747508599450
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\overview-summary.html = 1747508599519
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\overview-tree.html = 1747508599372
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\package-search-index.js = 1747508599456
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\script.js = 1747508599536
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\search-page.js = 1747508599551
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\search.html = 1747508599516
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\search.js = 1747508599547
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\serialized-form.html = 1747508599066
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\stylesheet.css = 1747508599532
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\tag-search-index.js = 1747508599466
-C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\type-search-index.js = 1747508599460
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\generated-sources\annotations = 1749469034880
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\allclasses-index.html = 1749469061399
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\allpackages-index.html = 1749469061405
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\copy.svg = 1749469061506
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\element-list = 1749469060743
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\help-doc.html = 1749469061492
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\index-all.html = 1749469061476
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\index.html = 1749469061342
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\link.svg = 1749469061510
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\member-search-index.js = 1749469061415
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\module-search-index.js = 1749469061409
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\overview-summary.html = 1749469061484
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\overview-tree.html = 1749469061334
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\package-search-index.js = 1749469061411
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\script.js = 1749469061504
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\search-page.js = 1749469061520
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\search.html = 1749469061480
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\search.js = 1749469061516
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\serialized-form.html = 1749469060989
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\stylesheet.css = 1749469061500
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\tag-search-index.js = 1749469061417
+C:\Users\MONSTER\IdeaProjects\BankManagementSystem\bank-common\target\apidocs\type-search-index.js = 1749469061413

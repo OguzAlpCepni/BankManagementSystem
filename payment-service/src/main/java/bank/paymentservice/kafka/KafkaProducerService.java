@@ -1,6 +1,7 @@
 package bank.paymentservice.kafka;
 
 import bank.paymentservice.entity.Payment;
+
 import io.github.oguzalpcepni.event.PaymentRequestedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
