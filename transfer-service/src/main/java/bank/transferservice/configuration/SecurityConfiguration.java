@@ -21,7 +21,7 @@ public class SecurityConfiguration {
 
         http.authorizeHttpRequests(auth -> auth
         // POST /transfers - Müşteri ve Admin
-                .requestMatchers(HttpMethod.POST, "/api/v1/transfers").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/transfers").hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
                 // GET tekil transfer sorgulamaları
                 .requestMatchers(HttpMethod.GET,
@@ -34,7 +34,7 @@ public class SecurityConfiguration {
 
                 // GET tüm transferleri duruma göre listeleme (Sadece yetkililer)
                 .requestMatchers(HttpMethod.GET, "/api/v1/transfers/status/{status}")
-                .hasAnyAuthority("EMPLOYEE", "ADMIN")
+                        .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
 
                 // PUT transfer iptali (Müşteri sadece kendi transferini iptal edebilir)
@@ -42,9 +42,9 @@ public class SecurityConfiguration {
                 .hasAnyAuthority("CUSTOMER", "ADMIN", "EMPLOYEE")
 
                 // PUT transfer durum güncelleme (Sistem ve yetkililer)
-                .requestMatchers(HttpMethod.PUT, "/api/v1/transfers/{transferId}/status").hasAnyAuthority("ADMIN", "EMPLOYEE", "SERVICE")
+                .requestMatchers(HttpMethod.PUT, "/api/v1/transfers/{transferId}/status").hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
-                .requestMatchers(HttpMethod.GET, "/api/v1/transfers/{transferTransactionId}/transferTransactionId").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/transfers/{transferTransactionId}/transferTransactionId").hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
                 // Tüm diğer istekler için authentication zorunlu
                 .anyRequest().authenticated()
         );

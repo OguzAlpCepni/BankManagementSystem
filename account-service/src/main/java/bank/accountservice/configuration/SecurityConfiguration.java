@@ -1,6 +1,7 @@
 package bank.accountservice.configuration;
 
 import io.github.oguzalpcepni.security.configuration.BaseSecurityService;
+import io.github.oguzalpcepni.security.jwt.BaseJwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +25,7 @@ public class SecurityConfiguration {
                 // Temel Hesap İşlemleri
                 // ----------------------
                 .requestMatchers(HttpMethod.GET, "/api/v1/accounts/{id}")
-                .permitAll()
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
                 .requestMatchers(HttpMethod.GET, "/api/v1/accounts/iban/{iban}")
                 .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
@@ -36,11 +37,11 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.GET, "/api/v1/accounts/{id}/balance-check")
                 .hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{id}/debit")
-                .permitAll()
+                .hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/credit")
-                .permitAll()
+                .hasAuthority("ADMIN")
                 .requestMatchers(HttpMethod.POST, "/api/v1/accounts/{iban}/compensate")
-                .permitAll()
+                .hasAuthority("ADMIN")
 
                 // ----------------------
                 // Kurumsal Hesaplar
@@ -96,4 +97,5 @@ public class SecurityConfiguration {
         
         return http.build();
     }
+
 }

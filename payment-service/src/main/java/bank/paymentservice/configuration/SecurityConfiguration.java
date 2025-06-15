@@ -21,11 +21,11 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests(auth -> auth
                 // Allow unauthenticated access to mock payment endpoint
                 .requestMatchers(HttpMethod.POST, "/api/v1/payment/pay")
-                .permitAll()
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
                 // Restrict bill payments to customers and admins
                 .requestMatchers(HttpMethod.POST, "/api/v1/payment/payBill")
-                .hasAnyAuthority("CUSTOMER", "ADMIN")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
                 // Secure all other endpoints
                 .anyRequest().authenticated()

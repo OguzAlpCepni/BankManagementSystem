@@ -22,7 +22,7 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests(auth -> auth
                 // Tüm müşterileri listeleme - sadece yönetici ve çalışanlar
                 .requestMatchers(HttpMethod.GET, "/api/v1/customers")
-                .hasAnyAuthority("ADMIN", "EMPLOYEE")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
                 // Müşteri detaylarını görüntüleme - müşteri kendi bilgilerini, çalışan/yönetici tüm bilgileri görebilir
                 .requestMatchers(HttpMethod.GET, "/api/v1/customers/**")

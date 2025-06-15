@@ -20,6 +20,7 @@ import io.github.oguzalpcepni.event.LoanUnderwritingCompletedEvent;
 import io.github.oguzalpcepni.event.LoanUnderwritingRejectedEvent;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LoanServiceImpl implements LoanService {
 
     private final LoanApplicationRepository loanApplicationRepository;
@@ -40,7 +42,9 @@ public class LoanServiceImpl implements LoanService {
 
     @Override
     public LoanStatusResponse createLoan(LoanRequest loanRequest) {
+        log.info("Creating loan {}", loanRequest);
         UUID customerId = UUID.fromString(SecurityContextHolder.getContext().getAuthentication().getName());
+        log.info("Create loan with customer id {}", customerId);
         LoanApplication loanApplication = new LoanApplication();
         loanApplication.setCustomerId(customerId);
         loanApplication.setAmount(loanRequest.getAmount());
@@ -83,12 +87,10 @@ public class LoanServiceImpl implements LoanService {
     @Transactional
     public LoanTransferResponse ApproveAndTransferMoney(UUID id, LoanAccountDto loanAccountDto){
         LoanApplication loanApplication = loanApplicationRepository.findById(id).orElseThrow(() -> new BusinessException("could not found any loanApplication"));
-
         // 1) Loan durumu hala UNDERWRITTEN mı kontrol et
         if (loanApplication.getStatus() != LoanStatus.UNDERWRITTEN) {
             throw new BusinessException("Loan is not in UNDERWRITTEN state: " + loanApplication.getId());
         }
-
         TransferRequest transferRequest = new TransferRequest();
         // bizim vermemiz gerekenler // buraya bir incele bakalım hata olabilir
         transferRequest.setSourceAccountId(UUID.fromString("19222397-bd78-4cf6-b633-0003538a3a58")); // banka id olarak dusun
@@ -102,23 +104,25 @@ public class LoanServiceImpl implements LoanService {
         transferRequest.setTransactionReference("TR-" + generateRandomString(8));
 
         LoanTransferResponse loanTransferResponse = new LoanTransferResponse();
-
         try {
             ResponseEntity<TransferResponse> transferResponse =transferClient.initiateTransfer(transferRequest);
+            log.info("Transfer response status: {}", transferResponse.getStatusCode());
+            log.info("Transfer response body: {}", transferResponse.getBody());
             if (transferResponse != null && transferResponse.getBody() != null) {
                 String transactionReference = transferResponse.getBody().getTransactionReference();
-
                 ResponseEntity<String> transferLastStatus = transferClient.getStatusByTransferTransactionId(transactionReference);
-
-                if (transferLastStatus != null && transferLastStatus.getBody().equals("COMPLETED")) {
+                log.info(transferLastStatus.getBody());
+                if (transferLastStatus != null && transferLastStatus.getBody().equals("DEBITED")) {
+                    log.info("Transfer last status: {}", transferLastStatus.getBody());
                     loanApplication.setStatus(LoanStatus.APPROVED);
                     loanTransferResponse.setNewStatus(String.valueOf(loanApplication.getStatus()));
                     loanTransferResponse.setTransferStatus("COMPLETED");
                     loanTransferResponse.setMessage("transfer successful");
                 }
             }
-
         }catch (BusinessException businessException){
+            log.info("1");
+            log.error("Transfer çağrısı sırasında istisna: {}", businessException.getMessage(), businessException);
             // Feign/HTTP çağrısı sırasında exception fırladıysa
             loanApplication.setStatus(LoanStatus.TRANSFER_FAILED);
             loanTransferResponse.setNewStatus(String.valueOf(loanApplication.getStatus()));
@@ -126,10 +130,9 @@ public class LoanServiceImpl implements LoanService {
             loanTransferResponse.setMessage("transfer failed");
             throw new BusinessException("Transfer sırasında hata: " + businessException.getMessage());
         }
+        log.info("Final loan status before saving: {}", loanApplication.getStatus());
         loanApplicationRepository.save(loanApplication);
-
         loanTransferResponse.setLoanId(loanApplication.getId());
-
         return loanTransferResponse;
     }
     @Override
@@ -145,9 +148,6 @@ public class LoanServiceImpl implements LoanService {
         // 3) LoanApplication durumunu güncelle (REJECTED)
         loanApplication.setStatus(LoanStatus.REJECTED);
         loanApplicationRepository.save(loanApplication);
-
-
-
     }
     /**
      * Çok basit bir örnek: customerId'nin hash koduna göre 300-850 aralığında bir puan döner.

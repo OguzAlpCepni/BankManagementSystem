@@ -23,15 +23,15 @@ public class SecurityConfiguration {
         http.authorizeHttpRequests(auth -> auth
                 // Kredi skoru sorgulama - sadece müşteri kendi skorunu, çalışan/yönetici tüm skorları görebilir
                 .requestMatchers(HttpMethod.GET, "/api/v1/loan-application/credit-score/{customerId}")
-                .permitAll()
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
                 // Yeni kredi başvurusu oluşturma - sadece müşteriler
                 .requestMatchers(HttpMethod.POST, "/api/v1/loan-application")
-                .hasAnyAuthority("CUSTOMER","ADMIN")
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
                 // Krediyi onaylayıp para transferi yapma - sadece çalışan ve yöneticiler
                 .requestMatchers(HttpMethod.POST, "/api/v1/loan-application/{loanId}/transfer")
-                .permitAll()
+                .hasAnyAuthority("CUSTOMER", "EMPLOYEE", "ADMIN")
 
                 // Diğer tüm endpointler için kimlik doğrulama gerekli
                 .anyRequest().authenticated()
