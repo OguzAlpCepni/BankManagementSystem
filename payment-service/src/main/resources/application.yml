@@ -1,50 +1,10 @@
+configurl: http://localhost:8079
+
 spring:
   application:
-    name: payment-service
-
-  datasource:
-    url: jdbc:postgresql://localhost:5477/payment
-    username: postgres
-    password: postgres
-
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    showSql: true
-    hibernate:
-      ddlAuto: update
-
-
+    name: "payment-service"
   cloud:
-    function:
-      definition: paymentStatusUpdateEventConsumer
-
-    stream:
-      defaultBinder: kafka
-      bindings:
-        paymentRequested-out-0:
-          destination: paymentstart-payment
-          content-type: application/json
-        paymentStatusUpdateEventConsumer-in-0:
-          destination: StatusUpdate-paymentstatus
-          content-type: application/json
-          group: paymentStatusUpdate-group
-      kafka:
-        binder:
-          brokers: localhost:9092
-
-
-server:
-  port: 8077
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8888/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+    config:
+      profile: local
+  config:
+    import: configserver:${configurl}

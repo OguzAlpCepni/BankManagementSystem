@@ -1,64 +1,10 @@
+configurl: http://localhost:8079
+
 spring:
   application:
-    name: api-gateway
-
+    name: "api-gateway"
   cloud:
-    gateway:
-      routes:
-        - id: "account-service-corporate"
-          uri: "lb://account-service"
-          predicates:
-            - "Path=/api/v1/corporate-accounts/**"
-
-        - id: "account-service-individual"
-          uri: "lb://account-service"
-          predicates:
-            - "Path=/api/v1/individual-accounts/**"
-
-        - id: "account-service-general"
-          uri: "lb://account-service"
-          predicates:
-            - "Path=/api/v1/accounts/**"
-
-        - id: "customer-service"
-          uri: "lb://customer-service"
-          predicates:
-            - "Path=/api/v1/customers/**"
-
-
-        - id: "loan-service"
-          uri: "lb://loan-service"
-          predicates:
-            - "Path=/api/v1/loan-application/**"
-
-
-        - id: "payment-service"
-          uri: "lb://payment-service"
-          predicates:
-            - "Path=/api/v1/payment/**"
-
-
-        - id: "transfer-service"
-          uri: "lb://transfer-service"
-          predicates:
-            - "Path=/api/v1/transfers/**"
-
-
-        - id: "auth-service"
-          uri: "lb://user-service"
-          predicates:
-            - "Path=/api/v1/auth/**"
-
-server:
-  port: 8080
-
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8888/eureka/
-    register-with-eureka: true
-    fetch-registry: true
-
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+    config:
+      profile: local
+  config:
+    import: configserver:${configurl}

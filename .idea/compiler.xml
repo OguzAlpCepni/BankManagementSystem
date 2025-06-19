@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="bank-common" />
+        <module name="config-server" />
         <module name="discovery-server" />
       </profile>
       <profile name="Annotation profile for user-service" enabled="true">
@@ -39,6 +40,7 @@
       <module name="account-service" options="-parameters" />
       <module name="accountservice" options="-parameters" />
       <module name="api-gateway" options="-parameters" />
+      <module name="config-server" options="-parameters" />
       <module name="customer-service" options="-parameters" />
       <module name="discovery-server" options="-parameters" />
       <module name="loan-service" options="-parameters" />

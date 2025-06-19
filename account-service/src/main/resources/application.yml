@@ -1,27 +1,10 @@
+configurl: http://localhost:8079
+
 spring:
   application:
     name: "account-service"
-  datasource:
-    url: "jdbc:postgresql://localhost:5411/account"
-    username: postgres
-    password: postgres
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    showSql: true
-    hibernate:
-      ddlAuto: update
-
-server:
-  port: 8010
-
-eureka:
-  client:
-    service-url:
-      defaultZone: "http://localhost:8888/eureka/"
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+  cloud:
+    config:
+      profile: local
+  config:
+    import: configserver:${configurl}

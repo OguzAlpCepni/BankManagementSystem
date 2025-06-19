@@ -143,6 +143,175 @@ services:
       - BITNAMI_DEBUG=yes
       - KAFKA_CFG_NUM_PARTITIONS=2
 
+  # === CORE SERVICES ===
+
+  config-server:
+    build:
+      context: ./config-server
+    container_name: config-server
+    ports:
+      - "8070:8070"
+    networks:
+      - app-network
+    restart: on-failure
+
+
+  discovery-server:
+    build:
+      context: ./discovery-server
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    networks:
+      - app-network
+    depends_on:
+      config-server:
+        condition: service_healthy
+    restart: on-failure
+
+  customer-service:
+    build:
+      context: ./customer-service
+    container_name: customer-service
+    ports:
+      - "8071:8071"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      mongo:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
+
+  account-service:
+    build:
+      context: ./account-service
+    container_name: account-service
+    ports:
+      - "8010:8010"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      postgres5411:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
+
+  transfer-service:
+    build:
+      context: ./transfer-service
+    container_name: transfer-service
+    ports:
+      - "8021:8021"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      postgres5421:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
+
+  transaction-service:
+    build:
+      context: ./transaction-service
+    container_name: transaction-service
+    ports:
+      - "8040:8040"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      postgres5451:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
+
+  user-service:
+    build:
+      context: ./user-service
+    container_name: user-service
+    ports:
+      - "8061:8061"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      postgres5461:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
+
+  payment-service:
+    build:
+      context: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8077:8077"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      postgres5477:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
+
+  loan-service:
+    build:
+      context: ./loan-service
+    container_name: loan-service
+    ports:
+      - "8091:8091"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      postgres5491:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
+
+  fraud-service:
+    build:
+      context: ./fraud-service
+    container_name: fraud-service
+    ports:
+      - "8095:8095"
+    networks:
+      - app-network
+    depends_on:
+      discovery-server:
+      postgres5495:
+      kafka:
+      config-server:
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8070
+    restart: on-failure
 
 networks:
   app-network:

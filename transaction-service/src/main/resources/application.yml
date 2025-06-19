@@ -1,75 +1,10 @@
+configurl: http://localhost:8079
+
 spring:
   application:
     name: "transaction-service"
-  datasource:
-    url: "jdbc:postgresql://localhost:5451/transaction"
-    username: postgres
-    password: postgres
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-    showSql: true
-    hibernate:
-      ddlAuto: update
   cloud:
-    function:
-      definition: handleTransferDebitedEvent; loanApplicationCreatedEventConsumer; resultFraudConsumer; paymentRequestedConsumer
-    stream:
-      defaultBinder: kafka
-      bindings:
-        # Transfer events
-        handleTransferDebitedEvent-in-0:
-          destination: transfer-money
-          content-type: application/json
-          group: transaction-service-group
-
-        transactionCompleted-out-0:
-          destination: transaction-completed-topic
-          content-type: application/json
-
-        loanApplicationCreatedEventConsumer-in-0:
-          destination: start-loan
-          content-type: application/json
-          group: startLoan-group
-
-        checkFraud-out-0:
-          destination: check-fraud
-          content-type: application/json
-
-        resultFraudConsumer-in-0:
-          destination: result-fraud
-          content-type: application/json
-          group: resultFraud-group
-
-        underwritingCompleted-out-0:
-          destination: underwritingComplete-fraud
-          content-type: application/json
-
-        underwritingRejected-out-0:
-          destination: underwritingRejected-fraud
-          content-type: application/json
-
-        paymentRequestedConsumer-in-0:
-          destination: paymentstart-payment
-          content-type: application/json
-          group: paymentStart-group
-        paymentStatusUpdate-out-0:
-          destination: StatusUpdate-paymentstatus
-          content-type: application/json
-      kafka:
-        binder:
-          brokers: localhost:9092
-
-server:
-  port: 8040
-
-eureka:
-  client:
-    service-url:
-      defaultZone: "http://localhost:8888/eureka/"
-    register-with-eureka: true
-    fetch-registry: true
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${server.port}
+    config:
+      profile: local
+  config:
+    import: configserver:${configurl}
