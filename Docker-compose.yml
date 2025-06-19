@@ -16,6 +16,12 @@ services:
       - app-network
     volumes:
       - postgres5411_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
 # transfer db
   postgres5421:
@@ -32,6 +38,12 @@ services:
       - app-network
     volumes:
       - postgres5421_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 #transaction db
   postgres5451:
     image: postgres:latest
@@ -47,6 +59,12 @@ services:
       - app-network
     volumes:
       - postgres5451_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   # user service db
   postgres5461:
@@ -63,6 +81,12 @@ services:
       - app-network
     volumes:
       - postgres5461_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 #customerdb
   mongo:
     image: mongo
@@ -73,6 +97,11 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: root
     volumes:
       - mongodb_data:/data/db
+    networks:
+      - app-network
+    restart: unless-stopped
+
+
 
   # loan service db
   postgres5491:
@@ -89,6 +118,12 @@ services:
       - app-network
     volumes:
       - postgres5491_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   # fraud service db
   postgres5495:
@@ -105,6 +140,12 @@ services:
       - app-network
     volumes:
       - postgres5495_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   # payment service db
   postgres5477:
@@ -121,6 +162,12 @@ services:
       - app-network
     volumes:
       - postgres5477_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
 
   kafka:
     image: bitnami/kafka
@@ -142,6 +189,12 @@ services:
       - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
       - BITNAMI_DEBUG=yes
       - KAFKA_CFG_NUM_PARTITIONS=2
+    healthcheck:
+      test: [ "CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list" ]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   # === CORE SERVICES ===
 
@@ -150,9 +203,15 @@ services:
       context: ./config-server
     container_name: config-server
     ports:
-      - "8070:8070"
+      - "8079:8079"
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8079/actuator/health" ]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 5s
     restart: on-failure
 
 
@@ -161,13 +220,21 @@ services:
       context: ./discovery-server
     container_name: discovery-server
     ports:
-      - "8761:8761"
+      - "8888:8888"
+    environment:
+      - SPRING_CLOUD_CONFIG_PROFILE=dev
+      - CONFIGURL=http://config-server:8079
     networks:
       - app-network
     depends_on:
       config-server:
         condition: service_healthy
-    restart: on-failure
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8888/actuator/health" ]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
   customer-service:
     build:
@@ -179,12 +246,14 @@ services:
       - app-network
     depends_on:
       discovery-server:
-      mongo:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
   account-service:
@@ -197,12 +266,16 @@ services:
       - app-network
     depends_on:
       discovery-server:
+        condition: service_healthy
       postgres5411:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
   transfer-service:
@@ -215,12 +288,16 @@ services:
       - app-network
     depends_on:
       discovery-server:
+        condition: service_healthy
       postgres5421:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
   transaction-service:
@@ -233,12 +310,16 @@ services:
       - app-network
     depends_on:
       discovery-server:
+        condition: service_healthy
       postgres5451:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
   user-service:
@@ -251,12 +332,16 @@ services:
       - app-network
     depends_on:
       discovery-server:
+        condition: service_healthy
       postgres5461:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
   payment-service:
@@ -269,12 +354,16 @@ services:
       - app-network
     depends_on:
       discovery-server:
+        condition: service_healthy
       postgres5477:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
   loan-service:
@@ -287,12 +376,16 @@ services:
       - app-network
     depends_on:
       discovery-server:
+        condition: service_healthy
       postgres5491:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
   fraud-service:
@@ -305,12 +398,16 @@ services:
       - app-network
     depends_on:
       discovery-server:
+        condition: service_healthy
       postgres5495:
+        condition: service_healthy
       kafka:
+        condition: service_healthy
       config-server:
+        condition: service_healthy
     environment:
       - SPRING_CLOUD_CONFIG_PROFILE=dev
-      - CONFIGURL=http://config-server:8070
+      - CONFIGURL=http://config-server:8079
     restart: on-failure
 
 networks:

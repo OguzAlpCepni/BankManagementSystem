@@ -10,7 +10,7 @@ import bank.paymentservice.service.PaymentService;
 
 import io.github.oguzalpcepni.dto.payment.PaymentRequestDto;
 import io.github.oguzalpcepni.dto.payment.PaymentResponseDto;
-import io.github.oguzalpcepni.dto.payment.PaymentStatusUpdateDTOo;
+import io.github.oguzalpcepni.dto.payment.PaymentStatusUpdateDTO;
 import io.github.oguzalpcepni.exceptions.type.BusinessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void updatePaymentStatus(PaymentStatusUpdateDTOo statusUpdate) {
+    public void updatePaymentStatus(PaymentStatusUpdateDTO statusUpdate) {
         UUID id = statusUpdate.getPaymentId();
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Payment not found: " + id));

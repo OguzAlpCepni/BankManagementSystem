@@ -9,5 +9,18 @@ spring:
           default-label: main
           clone-on-start: true
           skip-ssl-validation: true
+          force-pull: true
+          timeout: 10
+          refresh-rate: 60
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
 server:
   port: 8079

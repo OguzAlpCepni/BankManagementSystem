@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-public class PaymentStatusUpdateDTOo {
+public class PaymentStatusUpdateDTO {
 
     private UUID paymentId;
     private String newStatus;
