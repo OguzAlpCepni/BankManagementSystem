@@ -93,9 +93,10 @@ public class LoanServiceImpl implements LoanService {
         }
         TransferRequest transferRequest = new TransferRequest();
         // bizim vermemiz gerekenler // buraya bir incele bakalım hata olabilir
-        transferRequest.setSourceAccountId(UUID.fromString("19222397-bd78-4cf6-b633-0003538a3a58")); // banka id olarak dusun
+        // mock account
+        transferRequest.setSourceAccountId(UUID.fromString("1a8e3ed9-b20f-48fe-aa2b-5807a87f4099")); // banka id olarak dusun
         transferRequest.setTargetAccountId(loanAccountDto.getTargetAccountId());
-        transferRequest.setSourceIban("TR79959859869241758261399250");
+        transferRequest.setSourceIban("TR68554080368123808309396931");
         transferRequest.setTargetIban(loanAccountDto.getTargetIban());
         transferRequest.setAmount(loanApplication.getAmount());
         transferRequest.setCurrency("TRY");

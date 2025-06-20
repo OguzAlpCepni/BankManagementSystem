@@ -30,9 +30,6 @@ public class FraudServiceImpl implements FraudService {
         boolean result = streamBridge.send("resultFraud-out-0",resultEvent);
         log.info("event send : {} ",result);
 
-
-
-
     }
     private boolean evaluateFraud(Integer creditScore, BigDecimal amount) {
 
@@ -40,7 +37,7 @@ public class FraudServiceImpl implements FraudService {
             // Eksik veri varsa reddedelim
             return false;
         }
-        if (creditScore < 600) {
+        if (creditScore < 200) {
             return false;
         }
         // Örnek: eğer tutar 100.000’den fazla ise reddet

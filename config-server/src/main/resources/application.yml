@@ -12,6 +12,12 @@ spring:
           force-pull: true
           timeout: 10
           refresh-rate: 60
+      fail-fast: true
+      retry:
+        initial-interval: 3000
+        max-attempts: 6
+        max-interval: 15000
+        multiplier: 1.5
 
 management:
   endpoints:
