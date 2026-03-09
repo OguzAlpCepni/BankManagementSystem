@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;
 
-//kalem
+//sdjfhgasdhfajsdfhsdf
 public interface InstallmentRepository extends JpaRepository<Installment, UUID> {
 }
